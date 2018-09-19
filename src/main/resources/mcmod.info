@@ -1,0 +1,14 @@
+[
+{
+  "modid": "multipiston",
+  "name": "Piston Unlimited",
+  "description": "Piston unlimited adds the multipiston block which allows you to move any block with a handy GUI into any direction!",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "http://minecolonies.com",
+  "updateUrl": "",
+  "authorList": ["Let's Dev Together Team"],
+  "screenshots": [],
+  "dependencies": []
+}
+]

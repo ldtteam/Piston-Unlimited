@@ -1,0 +1,6 @@
+{
+  "id": "multipiston:arrows",
+  "types": [
+    "multipiston:styles/arrows/image/images.json"
+  ]
+}

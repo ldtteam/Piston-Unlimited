@@ -1,0 +1,211 @@
+
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+    }
+}
+
+plugins {
+    id "com.matthewprenger.cursegradle" version "1.1.0"
+}
+
+repositories {
+    maven {
+        name 'LDTTeam - Modding'
+        url 'https://ldtteam.jfrog.io/ldtteam/modding/'
+    }
+}
+
+apply plugin: 'idea'
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'jacoco'
+apply plugin: 'maven'
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+}
+
+ext.configFile = file "build.properties"
+configFile.withReader {
+    def prop = new Properties()
+    prop.load(it)
+    ext.config = new ConfigSlurper().parse prop
+}
+
+dependencies {
+    deobfCompile "com.ldtteam:blockout:${config.minecraft_version}-${config.blockout_version}"
+    compile 'com.intellij:annotations:+@jar'
+}
+
+group = "com.multipiston"
+version = config.minecraft_version.toString() + "-" + System.getenv()["Version"]
+archivesBaseName = "multipiston"
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+minecraft {
+
+    version = config.minecraft_version + "-" + config.forge_version
+    runDir = "run"
+    useDepAts=true
+
+    mappings = "${config.mappings}"
+    replace "@VERSION@", project.version
+    replaceIn "util/constant/Constants.java"
+    if (project.hasProperty("signature"))
+        replace "@FINGERPRINT@", signature
+}
+
+processResources {
+
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version': project.version, 'mcversion': project.minecraft.version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+
+jar {
+    from sourceSets.main.output
+    
+    classifier = 'universal'
+
+    manifest {
+        attributes 'FMLAT': "multipiston_at.cfg"
+    }
+}
+
+javadoc {
+    source += sourceSets.api.allSource
+}
+
+// add a javadoc jar
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+reobf {
+    jar {}
+}
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourceJar
+}
+
+javadoc {
+    source += sourceSets.main.allSource
+}
+
+idea {
+    module {
+        inheritOutputDirs = true
+    }
+}
+
+task signJar(type: SignJar, dependsOn: reobfJar) {
+    onlyIf { // Skip the task if our secret data isn't available
+        project.hasProperty('keyStore')
+    }
+
+    if (project.hasProperty('keyStore')) {
+        keyStore = project.keyStore // This needs to be a path to the keystore file
+        alias = project.keyStoreAlias
+        storePass = project.keyStorePass
+        keyPass = project.keyStoreKeyPass
+        inputFile = jar.archivePath
+        outputFile = jar.archivePath
+    }
+}
+
+build.dependsOn signJar
+
+curseforge {
+    if (System.getenv().CURSEAPIKEY != null && System.getenv().CURSERELEASETYPE != null)
+    {
+        apiKey = System.getenv().CURSEAPIKEY
+
+        project {
+            id = '245506'
+
+            changelog = file('build/changelog.md')
+            changelogType = 'markdown'
+            releaseType = System.getenv().CURSERELEASETYPE
+
+            mainArtifact (jar) {
+                displayName = "multipiston: " + version
+
+                relations {
+                    requiredDependency 'blockout' // blockout is required
+                }
+            }
+
+            addArtifact sourceJar
+        }
+    }
+    else
+    {
+        logger.lifecycle("Cannot run the CurseUpload sequence. No API-Key or release type has been provided.")
+    }
+}
+
+task("createChangelog") {
+    group = 'upload'
+
+    doLast {
+        def teamCityURL = "https://teamcity.multipiston.com/"
+        def file = new FileOutputStream("build/changelog.md")
+        def out = new BufferedOutputStream(file)
+        def changesXML = new XmlSlurper().parse(teamCityURL + "guestAuth/app/rest/changes?locator=build:(id:" + teamcity["teamcity.build.id"] + ")")
+
+        def changes = changesXML.change
+        println("createChangelog: Identified " + changes.size() + " changes to be written into the changelog.")
+
+        out << "# multipiston Changelog \n"
+        out << "## Version: _" + version + "_ \n"
+
+        if (changes.size() > 0) {
+            for (int i = 0; i < changes.size(); i++) {
+                def changeDetailsURL = teamCityURL + "guestAuth/app/rest/changes/id:" + changes[i].@id.text()
+                def changeDetailsXml = new XmlSlurper().parse(changeDetailsURL)
+                def changeComment = changeDetailsXml.comment.text().trim()
+
+                out << "* " + changeComment + "\n"
+            }
+        } else {
+            out << "No Changes detected!"
+        }
+
+        out.close()
+    }
+}

@@ -1,0 +1,96 @@
+{
+  "id":"root",
+  "type": "blockout:root",
+  "style": "multipiston:arrows",
+  "size": "176,176",
+  "children": [
+    {
+      "id":"multipiston_main",
+      "type":"blockout:region",
+      "size":"176,176",
+      "margin":"0,0",
+      "children": [
+        {
+          "id": "range_label",
+          "type": "blockout:label",
+          "size": "40, 16",
+          "margin": "19,32",
+          "content": "${com.multipiston.coremod.gui.multipiston.range}"
+        },
+        {
+          "id": "speed_label",
+          "type": "blockout:label",
+          "size": "40, 16",
+          "margin": "19,48",
+          "content": "${com.multipiston.coremod.gui.multipiston.speed}"
+        },
+        {
+          "id": "range_input",
+          "type": "blockout:textfield",
+          "size": "16, 13",
+          "margin": "54,30"
+        },
+        {
+          "id": "speed_input",
+          "type": "blockout:textfield",
+          "size": "16, 13",
+          "margin": "54,45"
+        },
+        {
+          "id": "up",
+          "type": "blockout:button",
+          "size": "32, 32",
+          "margin": "32,-5",
+          "defaultBackgroundImage": "image:up",
+          "disabledBackgroundImage": "image:up",
+          "clickedBackgroundImage": "image:up"
+        },
+        {
+          "id": "down",
+          "type": "blockout:button",
+          "size": "32, 32",
+          "margin": "32, 69",
+          "defaultBackgroundImage": "image:down",
+          "disabledBackgroundImage": "image:down",
+          "clickedBackgroundImage": "image:down"
+        },
+        {
+          "id": "right",
+          "type": "blockout:button",
+          "size": "32, 32",
+          "margin": "74, 32",
+          "defaultBackgroundImage": "image:right",
+          "disabledBackgroundImage": "image:right",
+          "clickedBackgroundImage": "image:right"
+        },
+        {
+          "id": "left",
+          "type": "blockout:button",
+          "size": "32, 32",
+          "margin": "-15, 32",
+          "defaultBackgroundImage": "image:left",
+          "disabledBackgroundImage": "image:left",
+          "clickedBackgroundImage": "image:left"
+        },
+        {
+          "id": "plus",
+          "type": "blockout:button",
+          "size": "32, 32",
+          "margin": "74, 64",
+          "defaultBackgroundImage": "image:plus",
+          "disabledBackgroundImage": "image:plus",
+          "clickedBackgroundImage": "image:plus"
+        },
+        {
+          "id": "minus",
+          "type": "blockout:button",
+          "size": "32, 32",
+          "margin": "-10, 64",
+          "defaultBackgroundImage": "image:minus",
+          "disabledBackgroundImage": "image:minus",
+          "clickedBackgroundImage": "image:minus"
+        }
+      ]
+    }
+  ]
+}

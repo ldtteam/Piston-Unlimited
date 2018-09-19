@@ -1,0 +1,93 @@
+{
+  "id": "image",
+  "resources": [
+    {
+      "id": "image:cancel",
+      "data": "multipiston:styles/arrows/image/cancel.png"
+    },
+    {
+      "id": "image:confirm",
+      "data": "multipiston:styles/arrows/image/confirm.png"
+    },
+    {
+      "id": "image:copy",
+      "data": "multipiston:styles/arrows/image/copy.png"
+    },
+    {
+      "id": "image:cut",
+      "data": "multipiston:styles/arrows/image/cut.png"
+    },
+    {
+      "id": "image:up",
+      "data": "multipiston:styles/arrows/image/up.png"
+    },
+    {
+      "id": "image:down",
+      "data": "multipiston:styles/arrows/image/down.png"
+    },
+    {
+      "id": "image:right",
+      "data": "multipiston:styles/arrows/image/right.png"
+    },
+    {
+      "id": "image:left",
+      "data": "multipiston:styles/arrows/image/left.png"
+    },
+    {
+      "id": "image:minus",
+      "data": "multipiston:styles/arrows/image/minus.png"
+    },
+    {
+      "id": "image:plus",
+      "data": "multipiston:styles/arrows/image/plus.png"
+    },
+    {
+      "id": "image:up_green",
+      "data": "multipiston:styles/arrows/image/up_green.png"
+    },
+    {
+      "id": "image:down_green",
+      "data": "multipiston:styles/arrows/image/down_green.png"
+    },
+    {
+      "id": "image:right_green",
+      "data": "multipiston:styles/arrows/image/right_green.png"
+    },
+    {
+      "id": "image:left_green",
+      "data": "multipiston:styles/arrows/image/left_green.png"
+    },
+    {
+      "id": "image:minus_green",
+      "data": "multipiston:styles/arrows/image/minus_green.png"
+    },
+    {
+      "id": "image:plus_green",
+      "data": "multipiston:styles/arrows/image/plus_green.png"
+    },
+    {
+      "id": "image:up_red",
+      "data": "multipiston:styles/arrows/image/up_red.png"
+    },
+    {
+      "id": "image:down_red",
+      "data": "multipiston:styles/arrows/image/down_red.png"
+    },
+    {
+      "id": "image:right_red",
+      "data": "multipiston:styles/arrows/image/right_red.png"
+    },
+    {
+      "id": "image:left_red",
+      "data": "multipiston:styles/arrows/image/left_red.png"
+    },
+    {
+      "id": "image:minus_red",
+      "data": "multipiston:styles/arrows/image/minus_red.png"
+    },
+    {
+      "id": "image:plus_red",
+      "data": "multipiston:styles/arrows/image/plus_red.png"
+    }
+  ]
+}
