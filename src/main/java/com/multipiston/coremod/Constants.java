@@ -11,6 +11,9 @@ public class Constants
     public static final String MC_VERSION   = "[1.12,1.13]";
     public static final String INVENTORY    = "inventory";
 
+    public static final String MINECOLONIES_MOD_ID = "minecolonies";
+    public static final String MULTIBLOCK_PREV_NAME = "multiblock";
+
     /**
      * NBT tag constants for MultiPiston tileEntities.
      */

@@ -15,11 +15,13 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import static com.multipiston.coremod.Constants.INVENTORY;
+import static com.multipiston.coremod.Constants.MULTIBLOCK_PREV_NAME;
 
 @Mod.EventBusSubscriber
 @Mod(modid = Constants.MOD_ID, name = Constants.MOD_NAME, version = Constants.VERSION, dependencies="after:gbook",
@@ -119,5 +121,23 @@ public class MultiPiston
             ModelLoader.setCustomModelResourceLocation(item, 0,
               new ModelResourceLocation(block.getRegistryName(), INVENTORY));
         }
+    }
+
+    /**
+     * Called when the config is changed, used to synch between file and game.
+     *
+     * @param event the on config changed event.
+     */
+    @SubscribeEvent
+    public void missingMapping(@NotNull final RegistryEvent.MissingMappings<Block> event)
+    {
+        final IForgeRegistry registry = event.getRegistry();
+        event.getAllMappings().forEach((mapping) -> {
+            final String mappingString = mapping.key.toString();
+            if(mappingString.contains(Constants.MINECOLONIES_MOD_ID) && mappingString.contains(MULTIBLOCK_PREV_NAME))
+            {
+                mapping.remap(ModBlocks.multiPiston);
+            }
+        });
     }
 }
