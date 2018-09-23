@@ -24,7 +24,7 @@ import static com.multipiston.coremod.Constants.INVENTORY;
 import static com.multipiston.coremod.Constants.MULTIBLOCK_PREV_NAME;
 
 @Mod.EventBusSubscriber
-@Mod(modid = Constants.MOD_ID, name = Constants.MOD_NAME, version = Constants.VERSION, dependencies="after:gbook",
+@Mod(modid = Constants.MOD_ID, name = Constants.MOD_NAME, version = Constants.VERSION,
   /*dependencies = Constants.FORGE_VERSION,*/ acceptedMinecraftVersions = Constants.MC_VERSION)
 public class MultiPiston
 {
