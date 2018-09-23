@@ -103,10 +103,6 @@ jar {
     }
 }
 
-javadoc {
-    source += sourceSets.api.allSource
-}
-
 // add a javadoc jar
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
@@ -124,7 +120,7 @@ artifacts {
 }
 
 javadoc {
-    source += sourceSets.main.allSource
+    source += sourceSets.main.allJava
 }
 
 idea {

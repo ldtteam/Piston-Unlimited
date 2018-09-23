@@ -23,7 +23,8 @@ public final class ModBlocks
     }
 
     /**
-     * Initates all the blocks. At the correct time.
+     * Initiates all the blocks. At the correct time.
+     * @param registry the registry to register it wiht.
      */
     public static void init(final IForgeRegistry<Block> registry)
     {
