@@ -107,7 +107,16 @@ public class MultiPiston
     @SubscribeEvent
     public static void registerModels(@NotNull final ModelRegistryEvent event)
     {
-        createCustomModel(ModBlocks.multiPiston);
+        createCustomModel(ModBlocks.andesite);
+        createCustomModel(ModBlocks.diorite);
+        createCustomModel(ModBlocks.granite);
+        createCustomModel(ModBlocks.stone);
+        createCustomModel(ModBlocks.oak);
+        createCustomModel(ModBlocks.birch);
+        createCustomModel(ModBlocks.acacia);
+        createCustomModel(ModBlocks.spruce);
+        createCustomModel(ModBlocks.darkOak);
+        createCustomModel(ModBlocks.jungleWood);
     }
 
     /**
@@ -128,7 +137,7 @@ public class MultiPiston
      *
      * @param event the on config changed event.
      */
-    @SubscribeEvent
+  /*  @SubscribeEvent
     public void missingMapping(@NotNull final RegistryEvent.MissingMappings<Block> event)
     {
         final IForgeRegistry registry = event.getRegistry();
@@ -136,8 +145,9 @@ public class MultiPiston
             final String mappingString = mapping.key.toString();
             if(mappingString.contains(Constants.MINECOLONIES_MOD_ID) && mappingString.contains(MULTIBLOCK_PREV_NAME))
             {
-                mapping.remap(ModBlocks.multiPiston);
+                mapping.remap(ModBlocks.andesite);
             }
         });
     }
+*/
 }
