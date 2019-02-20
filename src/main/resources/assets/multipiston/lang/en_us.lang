@@ -1,3 +1,15 @@
-tile.multipiston.multipiston.name=MultiPiston
+tile.multipiston.stone.name=Stone MultiPiston
+tile.multipiston.andesite.name=Andesite MultiPiston
+tile.multipiston.dioriote.name=Diorite MultiPiston
+tile.multipiston.granite.name=Granite MultiPiston
+tile.multipiston.cobblestone.name=Cobblestone MultiPiston
+
+tile.multipiston.oak.name=Oak MultiPiston
+tile.multipiston.spruce.name=Spruce MultiPiston
+tile.multipiston.acacia.name=Acacia MultiPiston
+tile.multipiston.junglewood.name=Junglewood MultiPiston
+tile.multipiston.birch.name=Birch MultiPiston
+tile.multipiston.darkoak.name=Dark Oak MultiPiston
+
 com.multipiston.coremod.gui.multipiston.range=range:
 com.multipiston.coremod.gui.multipiston.speed=speed:

@@ -41,7 +41,7 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
     /**
      * This blocks name.
      */
-    private static final String BLOCK_NAME = "multipiston";
+    public static String name;
 
     /**
      * The resistance this block has.
@@ -52,21 +52,21 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
      * Constructor for the Substitution block.
      * sets the creative tab, as well as the resistance and the hardness.
      */
-    public MultiPiston()
+    public MultiPiston(String name)
     {
         super(Material.WOOD);
-        initBlock();
+        initBlock(name);
     }
 
     /**
      * initialize the block
      * sets the creative tab, as well as the resistance and the hardness.
      */
-    private void initBlock()
+    private void initBlock(String name)
     {
-        setRegistryName(BLOCK_NAME);
+        setRegistryName(name);
         setCreativeTab(CreativeTabs.SEARCH);
-        setTranslationKey(String.format("%s.%s", MOD_ID.toLowerCase(Locale.ENGLISH), BLOCK_NAME));
+        setTranslationKey(String.format("%s.%s", MOD_ID.toLowerCase(Locale.ENGLISH), name));
         setHardness(BLOCK_HARDNESS);
         setResistance(RESISTANCE);
     }
