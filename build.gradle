@@ -52,7 +52,16 @@ configFile.withReader {
     ext.config = new ConfigSlurper().parse prop
 }
 
+configurations {
+    shade {
+        transitive = false;
+    }
+}
+
 dependencies {
+    shade (group: 'com.ldtteam', name: 'JVoxelizer', version: '1.0.3-ALPHA', classifier: 'forge-1.12')
+    deobfCompile (group: 'com.ldtteam', name: 'JVoxelizer', version: '1.0.3-ALPHA', classifier: 'forge-1.12')
+
     deobfCompile "com.ldtteam:blockout:${config.minecraft_version}-${config.blockout_version}"
     compile 'com.intellij:annotations:+@jar'
 }
@@ -92,15 +101,22 @@ processResources {
     }
 }
 
-
 jar {
-    from sourceSets.main.output
-    
-    classifier = 'universal'
+    from (configurations.shade.files){
+        include '*'
+        into 'META-INF/libraries'
+    }
 
     manifest {
-        attributes 'FMLAT': "multipiston_at.cfg"
+        attributes([
+                'ContainedDeps': configurations.shade.files.collect { it.name }.join(' '),
+                'Maven-Artifact': "${project.group}:${project.archivesBaseName}:${project.version}:forge-1.12",
+                'Timestamp': System.currentTimeMillis(),
+                'FMLAT': "multipiston_at.cfg"
+        ])
     }
+
+    classifier 'universal-forge-1.12'
 }
 
 // add a javadoc jar

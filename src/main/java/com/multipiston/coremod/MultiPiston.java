@@ -26,7 +26,7 @@ import static com.multipiston.coremod.Constants.MULTIBLOCK_PREV_NAME;
 @Mod.EventBusSubscriber
 @Mod(modid = Constants.MOD_ID, name = Constants.MOD_NAME, version = Constants.VERSION, dependencies="required-after:blockout",
   /*dependencies = Constants.FORGE_VERSION,*/ acceptedMinecraftVersions = Constants.MC_VERSION)
-public class MultiPiston
+public class MultiPiston extends AbstractForgeMod
 {
     private static final Logger logger = LogManager.getLogger(Constants.MOD_ID);
 
