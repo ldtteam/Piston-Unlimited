@@ -1,11 +1,5 @@
 package com.multipiston.coremod.blocks;
 
-import com.ldtteam.blockout.BlockOut;
-import com.ldtteam.blockout.binding.dependency.DependencyObjectHelper;
-import com.ldtteam.blockout.binding.property.PropertyCreationHelper;
-import com.ldtteam.blockout.element.root.RootGuiElement;
-import com.ldtteam.blockout.element.simple.Button;
-import com.ldtteam.blockout.element.simple.TextField;
 import com.multipiston.coremod.tileentities.TileEntityMultiPiston;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -25,7 +19,6 @@ import java.util.Locale;
 import java.util.Optional;
 
 import static com.multipiston.coremod.Constants.*;
-
 
 /**
  * This Class is about the MultiPiston which takes care of pushing others around (In a non mean way).
@@ -73,15 +66,15 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
 
     @Override
     public boolean onBlockActivated(
-            final World worldIn,
-            final BlockPos pos,
-            final IBlockState state,
-            final EntityPlayer playerIn,
-            final EnumHand hand,
-            final EnumFacing facing,
-            final float hitX,
-            final float hitY,
-            final float hitZ)
+      final World worldIn,
+      final BlockPos pos,
+      final IBlockState state,
+      final EntityPlayer playerIn,
+      final EnumHand hand,
+      final EnumFacing facing,
+      final float hitX,
+      final float hitY,
+      final float hitZ)
     {
         final TileEntity tileEntity = worldIn.getTileEntity(pos);
         if (!worldIn.isRemote && tileEntity instanceof TileEntityMultiPiston)
@@ -89,7 +82,7 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
             final String[] speedCache = {String.valueOf(((TileEntityMultiPiston) tileEntity).getSpeed())};
             final String[] rangeCache = {String.valueOf(((TileEntityMultiPiston) tileEntity).getRange())};
 
-            BlockOut.getBlockOut().getProxy().getGuiController().openUI(
+            BlockOutHelper.getGuiController().openUI(
               playerIn,
               iGuiKeyBuilder -> iGuiKeyBuilder
                                   .forPosition(worldIn, pos)
@@ -107,18 +100,18 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
                                             TextField.TextFieldConstructionDataBuilder.class,
                                             textFieldConstructionDataBuilder -> textFieldConstructionDataBuilder
                                                                                   .withDependentContents(DependencyObjectHelper.createFromSetterAndGetter(
-                                                                                      (Object context) -> speedCache[0],
-                                                                                      (Object context, String input) -> {
-                                                                                          speedCache[0] = input;
-                                                                                          try
-                                                                                          {
-                                                                                              ((TileEntityMultiPiston) context).setSpeed(Integer.parseInt(input));
-                                                                                          }
-                                                                                          catch (final Exception ignored)
-                                                                                          {
-                                                                                              //Thrown when something other then a number is inserted. disregard.
-                                                                                          }
-                                                                                      }
+                                                                                    (Object context) -> speedCache[0],
+                                                                                    (Object context, String input) -> {
+                                                                                        speedCache[0] = input;
+                                                                                        try
+                                                                                        {
+                                                                                            ((TileEntityMultiPiston) context).setSpeed(Integer.parseInt(input));
+                                                                                        }
+                                                                                        catch (final Exception ignored)
+                                                                                        {
+                                                                                            //Thrown when something other then a number is inserted. disregard.
+                                                                                        }
+                                                                                    }
                                                                                     , "1")))
                                           .withControl("range_input",
                                             TextField.TextFieldConstructionDataBuilder.class,
@@ -141,98 +134,104 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
                                           .withControl(BUTTON_UP,
                                             Button.ButtonConstructionDataBuilder.class,
                                             buttonConstructionDataBuilder -> buttonConstructionDataBuilder
-                                                                                  .withClickedEventHandler(
-                                                                                    (button, buttonClickedEventArgs) -> {
-                                                                                        if (buttonClickedEventArgs != null && buttonClickedEventArgs.isStart())
-                                                                                      {
-                                                                                          ((TileEntityMultiPiston) tileEntity).directionButtonClicked(button,
-                                                                                            buttonClickedEventArgs.getButton());
-                                                                                      }
-                                                                                    })
-                                                                                  .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
-                                                                                    PropertyCreationHelper.createFromNonOptional(
-                                                                                      Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_UP)), Optional.empty()
-                                                                                    ), new ResourceLocation("image:plus")))
+                                                                               .withClickedEventHandler(
+                                                                                 (button, buttonClickedEventArgs) -> {
+                                                                                     if (buttonClickedEventArgs != null && buttonClickedEventArgs.isStart())
+                                                                                     {
+                                                                                         ((TileEntityMultiPiston) tileEntity).directionButtonClicked(button,
+                                                                                           buttonClickedEventArgs.getButton());
+                                                                                     }
+                                                                                 })
+                                                                               .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
+                                                                                 PropertyCreationHelper.createFromNonOptional(
+                                                                                   Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_UP)),
+                                                                                   Optional.empty()
+                                                                                 ), new ResourceLocation("image:plus")))
                                           )
                                           .withControl(BUTTON_DOWN,
                                             Button.ButtonConstructionDataBuilder.class,
                                             buttonConstructionDataBuilder -> buttonConstructionDataBuilder
-                                                                                  .withClickedEventHandler(
-                                                                                    (button, buttonClickedEventArgs) -> {
-                                                                                        if (buttonClickedEventArgs != null && buttonClickedEventArgs.isStart())
-                                                                                        {
-                                                                                            ((TileEntityMultiPiston) tileEntity).directionButtonClicked(button,
-                                                                                              buttonClickedEventArgs.getButton());
-                                                                                        }
-                                                                                    })
-                                                                                  .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
-                                                                                    PropertyCreationHelper.createFromNonOptional(
-                                                                                      Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_DOWN)), Optional.empty()
-                                                                                    ), new ResourceLocation("image:minus")))
+                                                                               .withClickedEventHandler(
+                                                                                 (button, buttonClickedEventArgs) -> {
+                                                                                     if (buttonClickedEventArgs != null && buttonClickedEventArgs.isStart())
+                                                                                     {
+                                                                                         ((TileEntityMultiPiston) tileEntity).directionButtonClicked(button,
+                                                                                           buttonClickedEventArgs.getButton());
+                                                                                     }
+                                                                                 })
+                                                                               .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
+                                                                                 PropertyCreationHelper.createFromNonOptional(
+                                                                                   Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_DOWN)),
+                                                                                   Optional.empty()
+                                                                                 ), new ResourceLocation("image:minus")))
                                           )
                                           .withControl(BUTTON_RIGHT,
                                             Button.ButtonConstructionDataBuilder.class,
                                             buttonConstructionDataBuilder -> buttonConstructionDataBuilder
-                                                                                  .withClickedEventHandler(
-                                                                                    (button, buttonClickedEventArgs) -> {
-                                                                                        if (buttonClickedEventArgs != null && buttonClickedEventArgs.isStart())
-                                                                                        {
-                                                                                            ((TileEntityMultiPiston) tileEntity).directionButtonClicked(button,
-                                                                                              buttonClickedEventArgs.getButton());
-                                                                                        }
-                                                                                    })
-                                                                                  .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
-                                                                                    PropertyCreationHelper.createFromNonOptional(
-                                                                                      Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_RIGHT)), Optional.empty()
-                                                                                    ), new ResourceLocation("image:right")))
+                                                                               .withClickedEventHandler(
+                                                                                 (button, buttonClickedEventArgs) -> {
+                                                                                     if (buttonClickedEventArgs != null && buttonClickedEventArgs.isStart())
+                                                                                     {
+                                                                                         ((TileEntityMultiPiston) tileEntity).directionButtonClicked(button,
+                                                                                           buttonClickedEventArgs.getButton());
+                                                                                     }
+                                                                                 })
+                                                                               .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
+                                                                                 PropertyCreationHelper.createFromNonOptional(
+                                                                                   Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_RIGHT)),
+                                                                                   Optional.empty()
+                                                                                 ), new ResourceLocation("image:right")))
                                           )
                                           .withControl(BUTTON_LEFT,
                                             Button.ButtonConstructionDataBuilder.class,
                                             buttonConstructionDataBuilder -> buttonConstructionDataBuilder
-                                                                                  .withClickedEventHandler(
-                                                                                    (button, buttonClickedEventArgs) -> {
-                                                                                        if (buttonClickedEventArgs != null && buttonClickedEventArgs.isStart())
-                                                                                        {
-                                                                                            ((TileEntityMultiPiston) tileEntity).directionButtonClicked(button,
-                                                                                              buttonClickedEventArgs.getButton());
-                                                                                        }
-                                                                                    })
-                                                                                  .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
-                                                                                    PropertyCreationHelper.createFromNonOptional(
-                                                                                      Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_LEFT)), Optional.empty()
-                                                                                    ), new ResourceLocation("image:left")))
+                                                                               .withClickedEventHandler(
+                                                                                 (button, buttonClickedEventArgs) -> {
+                                                                                     if (buttonClickedEventArgs != null && buttonClickedEventArgs.isStart())
+                                                                                     {
+                                                                                         ((TileEntityMultiPiston) tileEntity).directionButtonClicked(button,
+                                                                                           buttonClickedEventArgs.getButton());
+                                                                                     }
+                                                                                 })
+                                                                               .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
+                                                                                 PropertyCreationHelper.createFromNonOptional(
+                                                                                   Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_LEFT)),
+                                                                                   Optional.empty()
+                                                                                 ), new ResourceLocation("image:left")))
                                           )
                                           .withControl(BUTTON_FORWARD,
                                             Button.ButtonConstructionDataBuilder.class,
                                             buttonConstructionDataBuilder -> buttonConstructionDataBuilder
-                                                                                  .withClickedEventHandler(
-                                                                                    (button, buttonClickedEventArgs) -> {
-                                                                                        if (buttonClickedEventArgs != null && buttonClickedEventArgs.isStart())
-                                                                                        {
-                                                                                            ((TileEntityMultiPiston) tileEntity).directionButtonClicked(button,
-                                                                                              buttonClickedEventArgs.getButton());
-                                                                                        }
-                                                                                    })
-                                                                                  .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
-                                                                                    PropertyCreationHelper.createFromNonOptional(
-                                                                                      Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_FORWARD)), Optional.empty()
-                                                                                    ), new ResourceLocation("image:up")))
+                                                                               .withClickedEventHandler(
+                                                                                 (button, buttonClickedEventArgs) -> {
+                                                                                     if (buttonClickedEventArgs != null && buttonClickedEventArgs.isStart())
+                                                                                     {
+                                                                                         ((TileEntityMultiPiston) tileEntity).directionButtonClicked(button,
+                                                                                           buttonClickedEventArgs.getButton());
+                                                                                     }
+                                                                                 })
+                                                                               .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
+                                                                                 PropertyCreationHelper.createFromNonOptional(
+                                                                                   Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_FORWARD)),
+                                                                                   Optional.empty()
+                                                                                 ), new ResourceLocation("image:up")))
                                           )
                                           .withControl(BUTTON_BACKWARD,
                                             Button.ButtonConstructionDataBuilder.class,
                                             buttonConstructionDataBuilder -> buttonConstructionDataBuilder
-                                                                                  .withClickedEventHandler(
-                                                                                    (button, buttonClickedEventArgs) -> {
-                                                                                        if (buttonClickedEventArgs != null && buttonClickedEventArgs.isStart())
-                                                                                        {
-                                                                                            ((TileEntityMultiPiston) tileEntity).directionButtonClicked(button,
-                                                                                              buttonClickedEventArgs.getButton());
-                                                                                        }
-                                                                                    })
-                                                                                  .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
-                                                                                    PropertyCreationHelper.createFromNonOptional(
-                                                                                      Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_BACKWARD)), Optional.empty()
-                                                                                    ), new ResourceLocation("image:down")))
+                                                                               .withClickedEventHandler(
+                                                                                 (button, buttonClickedEventArgs) -> {
+                                                                                     if (buttonClickedEventArgs != null && buttonClickedEventArgs.isStart())
+                                                                                     {
+                                                                                         ((TileEntityMultiPiston) tileEntity).directionButtonClicked(button,
+                                                                                           buttonClickedEventArgs.getButton());
+                                                                                     }
+                                                                                 })
+                                                                               .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
+                                                                                 PropertyCreationHelper.createFromNonOptional(
+                                                                                   Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_BACKWARD)),
+                                                                                   Optional.empty()
+                                                                                 ), new ResourceLocation("image:down")))
                                           );
                                     }
                                   )
@@ -245,12 +244,12 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
     @Override
     public void neighborChanged(final IBlockState state, final World worldIn, final BlockPos pos, final Block blockIn, final BlockPos fromPos)
     {
-        if(worldIn.isRemote)
+        if (worldIn.isRemote)
         {
             return;
         }
         final TileEntity te = worldIn.getTileEntity(pos);
-        if(te instanceof TileEntityMultiPiston)
+        if (te instanceof TileEntityMultiPiston)
         {
             ((TileEntityMultiPiston) te).handleRedstone(worldIn.isBlockPowered(pos));
         }

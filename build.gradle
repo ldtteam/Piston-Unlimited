@@ -62,7 +62,7 @@ dependencies {
     shade (group: 'com.ldtteam', name: 'JVoxelizer', version: '1.0.3-ALPHA', classifier: 'forge-1.12')
     deobfCompile (group: 'com.ldtteam', name: 'JVoxelizer', version: '1.0.3-ALPHA', classifier: 'forge-1.12')
 
-    deobfCompile "com.ldtteam:blockout:${config.minecraft_version}-${config.blockout_version}"
+    deobfCompile "com.ldtteam:blockout:${config.minecraft_version}-${config.blockout_version}:universal-forge-1.12"
     compile 'com.intellij:annotations:+@jar'
 }
 
@@ -77,7 +77,6 @@ minecraft {
 
     version = config.minecraft_version + "-" + config.forge_version
     runDir = "run"
-    useDepAts=true
 
     mappings = "${config.mappings}"
     replace "@VERSION@", project.version
@@ -111,8 +110,7 @@ jar {
         attributes([
                 'ContainedDeps': configurations.shade.files.collect { it.name }.join(' '),
                 'Maven-Artifact': "${project.group}:${project.archivesBaseName}:${project.version}:forge-1.12",
-                'Timestamp': System.currentTimeMillis(),
-                'FMLAT': "multipiston_at.cfg"
+                'Timestamp': System.currentTimeMillis()
         ])
     }
 
