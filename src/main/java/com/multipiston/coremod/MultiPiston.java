@@ -1,5 +1,7 @@
 package com.multipiston.coremod;
 
+import com.ldtteam.jvoxelizer.launcher.forge_1_12.AbstractForgeMod;
+import com.ldtteam.jvoxelizer.launcher.forge_1_12.core.IForgeJVoxelizerSetupProxy;
 import com.multipiston.coremod.blocks.ModBlocks;
 import com.multipiston.coremod.tileentities.TileEntityMultiPiston;
 import net.minecraft.block.Block;
@@ -54,6 +56,8 @@ public class MultiPiston extends AbstractForgeMod
     @Mod.EventHandler
     public void preInit(@NotNull final FMLPreInitializationEvent event)
     {
+        super.preInit(event);
+
         @NotNull final Configuration configuration = new Configuration(event.getSuggestedConfigurationFile());
         configuration.load();
 
@@ -61,8 +65,17 @@ public class MultiPiston extends AbstractForgeMod
         {
             configuration.save();
         }
+
+        super.preInitializePlugins();
     }
 
+    @Override
+    protected IForgeJVoxelizerSetupProxy getModSetupProxy()
+    {
+        return () -> {
+            //Noop
+        };
+    }
 
     /**
      * Called when registering blocks,

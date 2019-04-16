@@ -1,5 +1,7 @@
 package com.multipiston.coremod.blocks;
 
+import com.ldtteam.blockout.connector.core.IGuiController;
+import com.ldtteam.jvoxelizer.launcher.forge_1_12.entity.living.player.PlayerEntity;
 import com.multipiston.coremod.tileentities.TileEntityMultiPiston;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -82,8 +84,10 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
             final String[] speedCache = {String.valueOf(((TileEntityMultiPiston) tileEntity).getSpeed())};
             final String[] rangeCache = {String.valueOf(((TileEntityMultiPiston) tileEntity).getRange())};
 
-            BlockOutHelper.getGuiController().openUI(
-              playerIn,
+
+
+            IGuiController.getInstance().openUI(
+              PlayerEntity.fromForge(playerIn),
               iGuiKeyBuilder -> iGuiKeyBuilder
                                   .forPosition(worldIn, pos)
                                   .usingDefaultData()
