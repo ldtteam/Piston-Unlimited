@@ -1,7 +1,16 @@
 package com.multipiston.coremod.blocks;
 
+import com.ldtteam.blockout.binding.dependency.DependencyObjectHelper;
+import com.ldtteam.blockout.binding.property.PropertyCreationHelper;
 import com.ldtteam.blockout.connector.core.IGuiController;
+import com.ldtteam.blockout.element.root.RootGuiElement;
+import com.ldtteam.blockout.element.simple.Button;
+import com.ldtteam.blockout.element.simple.TextField;
+import com.ldtteam.jvoxelizer.launcher.forge_1_12.dimension.Dimension;
 import com.ldtteam.jvoxelizer.launcher.forge_1_12.entity.living.player.PlayerEntity;
+import com.ldtteam.jvoxelizer.launcher.forge_1_12.util.identifier.Identifier;
+import com.ldtteam.jvoxelizer.launcher.forge_1_12.util.math.coordinate.block.BlockCoordinate;
+import com.ldtteam.jvoxelizer.util.identifier.IIdentifier;
 import com.multipiston.coremod.tileentities.TileEntityMultiPiston;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -89,10 +98,10 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
             IGuiController.getInstance().openUI(
               PlayerEntity.fromForge(playerIn),
               iGuiKeyBuilder -> iGuiKeyBuilder
-                                  .forPosition(worldIn, pos)
+                                  .forPosition(Dimension.fromForge(worldIn), BlockCoordinate.fromForge(pos))
                                   .usingDefaultData()
                                   .withDefaultItemHandlerManager()
-                                  .ofFile(new ResourceLocation("multipiston:gui/blockout_new/multipiston.json"))
+                                  .ofFile(IIdentifier.create("multipiston:gui/blockout_new/multipiston.json"))
                                   .usingData(iBlockOutGuiConstructionDataBuilder ->
                                     {
                                         iBlockOutGuiConstructionDataBuilder
@@ -133,7 +142,7 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
                                                                                           {
                                                                                               //Thrown when something other then a number is inserted. disregard.
                                                                                           }
-                                                                                      }
+                                                                                      }, true
                                                                                     ), "3")))
                                           .withControl(BUTTON_UP,
                                             Button.ButtonConstructionDataBuilder.class,
@@ -147,10 +156,11 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
                                                                                      }
                                                                                  })
                                                                                .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
-                                                                                 PropertyCreationHelper.createFromNonOptional(
-                                                                                   Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_UP)),
-                                                                                   Optional.empty()
-                                                                                 ), new ResourceLocation("image:plus")))
+                                                                                 PropertyCreationHelper.create(
+                                                                                   Optional.of((context) -> Identifier.fromForge(((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_UP))),
+                                                                                   Optional.empty(),
+                                                                                   true
+                                                                                 ), IIdentifier.create("image:plus")))
                                           )
                                           .withControl(BUTTON_DOWN,
                                             Button.ButtonConstructionDataBuilder.class,
@@ -164,10 +174,11 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
                                                                                      }
                                                                                  })
                                                                                .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
-                                                                                 PropertyCreationHelper.createFromNonOptional(
-                                                                                   Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_DOWN)),
-                                                                                   Optional.empty()
-                                                                                 ), new ResourceLocation("image:minus")))
+                                                                                 PropertyCreationHelper.create(
+                                                                                   Optional.of((context) -> Identifier.fromForge(((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_DOWN))),
+                                                                                   Optional.empty(),
+                                                                                   true
+                                                                                 ), IIdentifier.create("image:minus")))
                                           )
                                           .withControl(BUTTON_RIGHT,
                                             Button.ButtonConstructionDataBuilder.class,
@@ -181,10 +192,11 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
                                                                                      }
                                                                                  })
                                                                                .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
-                                                                                 PropertyCreationHelper.createFromNonOptional(
-                                                                                   Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_RIGHT)),
-                                                                                   Optional.empty()
-                                                                                 ), new ResourceLocation("image:right")))
+                                                                                 PropertyCreationHelper.create(
+                                                                                   Optional.of((context) -> Identifier.fromForge(((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_RIGHT))),
+                                                                                   Optional.empty(),
+                                                                                   true
+                                                                                 ), IIdentifier.create("image:right")))
                                           )
                                           .withControl(BUTTON_LEFT,
                                             Button.ButtonConstructionDataBuilder.class,
@@ -198,10 +210,11 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
                                                                                      }
                                                                                  })
                                                                                .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
-                                                                                 PropertyCreationHelper.createFromNonOptional(
-                                                                                   Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_LEFT)),
-                                                                                   Optional.empty()
-                                                                                 ), new ResourceLocation("image:left")))
+                                                                                 PropertyCreationHelper.create(
+                                                                                   Optional.of((context) -> Identifier.fromForge(((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_LEFT))),
+                                                                                   Optional.empty(),
+true
+                                                                                 ), IIdentifier.create("image:left")))
                                           )
                                           .withControl(BUTTON_FORWARD,
                                             Button.ButtonConstructionDataBuilder.class,
@@ -215,10 +228,11 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
                                                                                      }
                                                                                  })
                                                                                .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
-                                                                                 PropertyCreationHelper.createFromNonOptional(
-                                                                                   Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_FORWARD)),
-                                                                                   Optional.empty()
-                                                                                 ), new ResourceLocation("image:up")))
+                                                                                 PropertyCreationHelper.create(
+                                                                                   Optional.of((context) -> Identifier.fromForge(((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_FORWARD))),
+                                                                                   Optional.empty(),
+true
+                                                                                 ), IIdentifier.create("image:up")))
                                           )
                                           .withControl(BUTTON_BACKWARD,
                                             Button.ButtonConstructionDataBuilder.class,
@@ -232,10 +246,11 @@ public class MultiPiston extends AbstractBlockMultiPiston<MultiPiston>
                                                                                      }
                                                                                  })
                                                                                .withNormalBackgroundImageResource(DependencyObjectHelper.createFromProperty(
-                                                                                 PropertyCreationHelper.createFromNonOptional(
-                                                                                   Optional.of((context) -> ((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_BACKWARD)),
-                                                                                   Optional.empty()
-                                                                                 ), new ResourceLocation("image:down")))
+                                                                                 PropertyCreationHelper.create(
+                                                                                   Optional.of((context) -> Identifier.fromForge(((TileEntityMultiPiston) tileEntity).getButtonResource(BUTTON_BACKWARD))),
+                                                                                   Optional.empty(),
+true
+                                                                                 ), IIdentifier.create("image:down")))
                                           );
                                     }
                                   )

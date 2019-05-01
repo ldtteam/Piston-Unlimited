@@ -1,7 +1,10 @@
 package com.multipiston.coremod;
 
+import com.ldtteam.jvoxelizer.core.provider.holder.ProviderResolver;
 import com.ldtteam.jvoxelizer.launcher.forge_1_12.AbstractForgeMod;
 import com.ldtteam.jvoxelizer.launcher.forge_1_12.core.IForgeJVoxelizerSetupProxy;
+import com.ldtteam.jvoxelizer.launcher.forge_1_12.translation.TranslatorProvider;
+import com.ldtteam.jvoxelizer.translation.ITranslator;
 import com.multipiston.coremod.blocks.ModBlocks;
 import com.multipiston.coremod.tileentities.TileEntityMultiPiston;
 import net.minecraft.block.Block;
@@ -46,6 +49,11 @@ public class MultiPiston extends AbstractForgeMod
     public static Logger getLogger()
     {
         return logger;
+    }
+
+    public MultiPiston()
+    {
+        ProviderResolver.getInstance().registerProvider(ITranslator.class, TranslatorProvider.getInstance());
     }
 
     /**

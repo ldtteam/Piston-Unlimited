@@ -52,6 +52,13 @@ configFile.withReader {
     ext.config = new ConfigSlurper().parse prop
 }
 
+//Force minecraft compatible versions of dependencies
+configurations.all {
+    resolutionStrategy {
+        force 'com.google.guava:guava:21.0'
+    }
+}
+
 configurations {
     shade {
         transitive = false;
@@ -59,13 +66,8 @@ configurations {
 }
 
 dependencies {
-    shade (group: 'com.ldtteam', name: 'JVoxelizer', version: '1.0.3-ALPHA', classifier: 'forge-1.12')
-    deobfCompile (group: 'com.ldtteam', name: 'JVoxelizer', version: '1.0.3-ALPHA', classifier: 'forge-1.12')
-
-    deobfCompile "com.ldtteam.blockout:blockout-api:${config.minecraft_version}-${config.blockout_version}"
-    
-    runtime "com.ldtteam.blockout:blockout-forge-1.12:${config.minecraft_version}-${config.blockout_version}"
-    compile 'com.intellij:annotations:+@jar'
+    deobfCompile "com.ldtteam.blockout:blockout-api-forge-1.12:${config.blockout_version}"
+    deobfCompile "com.ldtteam.blockout:blockout-forge-1.12:${config.blockout_version}"
 }
 
 group = "com.multipiston"
