@@ -1,5 +1,10 @@
 package com.multipiston.coremod;
 
+import com.ldtteam.jvoxelizer.core.provider.holder.ProviderResolver;
+import com.ldtteam.jvoxelizer.launcher.forge_1_12.AbstractForgeMod;
+import com.ldtteam.jvoxelizer.launcher.forge_1_12.core.IForgeJVoxelizerSetupProxy;
+import com.ldtteam.jvoxelizer.launcher.forge_1_12.translation.TranslatorProvider;
+import com.ldtteam.jvoxelizer.translation.ITranslator;
 import com.multipiston.coremod.blocks.ModBlocks;
 import com.multipiston.coremod.tileentities.TileEntityMultiPiston;
 import net.minecraft.block.Block;
@@ -26,7 +31,7 @@ import static com.multipiston.coremod.Constants.MULTIBLOCK_PREV_NAME;
 @Mod.EventBusSubscriber
 @Mod(modid = Constants.MOD_ID, name = Constants.MOD_NAME, version = Constants.VERSION, dependencies="required-after:blockout",
   /*dependencies = Constants.FORGE_VERSION,*/ acceptedMinecraftVersions = Constants.MC_VERSION)
-public class MultiPiston
+public class MultiPiston extends AbstractForgeMod
 {
     private static final Logger logger = LogManager.getLogger(Constants.MOD_ID);
 
@@ -46,6 +51,11 @@ public class MultiPiston
         return logger;
     }
 
+    public MultiPiston()
+    {
+        ProviderResolver.getInstance().registerProvider(ITranslator.class, TranslatorProvider.getInstance());
+    }
+
     /**
      * Event handler for forge pre init event.
      *
@@ -54,6 +64,8 @@ public class MultiPiston
     @Mod.EventHandler
     public void preInit(@NotNull final FMLPreInitializationEvent event)
     {
+        super.preInit(event);
+
         @NotNull final Configuration configuration = new Configuration(event.getSuggestedConfigurationFile());
         configuration.load();
 
@@ -61,8 +73,17 @@ public class MultiPiston
         {
             configuration.save();
         }
+
+        super.preInitializePlugins();
     }
 
+    @Override
+    protected IForgeJVoxelizerSetupProxy getModSetupProxy()
+    {
+        return () -> {
+            //Noop
+        };
+    }
 
     /**
      * Called when registering blocks,

@@ -1,7 +1,7 @@
 package com.multipiston.coremod.tileentities;
 
 import com.google.common.primitives.Ints;
-import com.ldtteam.blockout.element.simple.Button;
+import com.ldtteam.blockout.element.IUIElement;
 import com.ldtteam.blockout.util.mouse.MouseButton;
 import com.multipiston.coremod.configuration.Configurations;
 import net.minecraft.block.material.EnumPushReaction;
@@ -406,7 +406,7 @@ public class TileEntityMultiPiston extends TileEntity implements ITickable
      * @param button the button in the GUI
      * @param mouseButton the mouse button.
      */
-    public void directionButtonClicked(final Button button, final MouseButton mouseButton)
+    public void directionButtonClicked(final IUIElement button, final MouseButton mouseButton)
     {
         switch (button.getId())
         {
@@ -440,7 +440,7 @@ public class TileEntityMultiPiston extends TileEntity implements ITickable
      * @param mouseButton the mouse button.
      * @param button the clicked button.
      */
-    private void setNewFacing(final EnumFacing facing, final MouseButton mouseButton, final Button button)
+    private void setNewFacing(final EnumFacing facing, final MouseButton mouseButton, final IUIElement button)
     {
         if (mouseButton == MouseButton.LEFT)
         {
