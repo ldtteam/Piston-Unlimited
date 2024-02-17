@@ -1,43 +1,56 @@
 package com.ldtteam.multipiston;
 
+import com.ldtteam.multipiston.network.MultiPistonChangeMessage;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.javafmlmod.FMLModContainer;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
+import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.function.Supplier;
 
 import static com.ldtteam.multipiston.ModBlocks.BLOCKS;
 import static com.ldtteam.multipiston.ModBlocks.ITEMS;
-import static com.ldtteam.multipiston.ModTileEntities.TILE_ENTITIES;
+import static com.ldtteam.multipiston.ModTileEntities.BLOCK_ENTITIES;
+import static com.ldtteam.multipiston.MultiPiston.MOD_ID;
 
-@Mod("multipiston")
+@Mod(MOD_ID)
 public class MultiPiston
 {
-    // Directly reference a log4j logger.
-    public static final Logger LOGGER = LogManager.getLogger();
-
     public static final String                            MOD_ID  = "multipiston";
     public static final DeferredRegister<CreativeModeTab> TAB_REG = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
 
-    public static final RegistryObject<CreativeModeTab> GENERAL = TAB_REG.register("general", () -> new CreativeModeTab.Builder(CreativeModeTab.Row.TOP, 1).icon(() -> new ItemStack(ModBlocks.multipiston.get())).title(Component.translatable("block.multipiston.multipistonblock")).displayItems((config, output) -> {
+    public static final Supplier<CreativeModeTab>
+      GENERAL = TAB_REG.register("general", () -> new CreativeModeTab.Builder(CreativeModeTab.Row.TOP, 1).icon(() -> new ItemStack(ModBlocks.multipiston.get())).title(Component.translatable("itemGroup." + MOD_ID)).displayItems((config, output) -> {
         output.accept(ModBlocks.multipiston.get());
     }).build());
 
-    public MultiPiston()
+    public MultiPiston(final FMLModContainer modContainer, final Dist dist)
     {
-        BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        TILE_ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
-        TAB_REG.register(FMLJavaModLoadingContext.get().getModEventBus());
+        final IEventBus modBus = modContainer.getEventBus();
 
-        Mod.EventBusSubscriber.Bus.MOD.bus().get().register(LifeCycleEvents.class);
-        Mod.EventBusSubscriber.Bus.MOD.bus().get().register(this.getClass());
+        BLOCKS.register(modBus);
+        ITEMS.register(modBus);
+        BLOCK_ENTITIES.register(modBus);
+        TAB_REG.register(modBus);
+
+        modBus.register(this.getClass());
+    }
+
+    @SubscribeEvent
+    public static void onNetworkRegistry(final RegisterPayloadHandlerEvent event)
+    {
+        final String modVersion = ModList.get().getModContainerById(MOD_ID).get().getModInfo().getVersion().toString();
+        final IPayloadRegistrar registry = event.registrar(MOD_ID).versioned(modVersion);
+
+        MultiPistonChangeMessage.TYPE.register(registry);
     }
 }

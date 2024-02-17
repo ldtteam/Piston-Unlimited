@@ -1,5 +1,6 @@
 package com.ldtteam.multipiston;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -24,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public class MultiPistonBlock extends BaseEntityBlock
 {
+    public static final MapCodec<MultiPistonBlock> CODEC = simpleCodec(MultiPistonBlock::new);
+
     /**
      * The hardness this block has.
      */
@@ -40,7 +43,12 @@ public class MultiPistonBlock extends BaseEntityBlock
      */
     public MultiPistonBlock()
     {
-        super(Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).strength(BLOCK_HARDNESS, RESISTANCE).isRedstoneConductor((a,b,c) -> true));
+        this(Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).strength(BLOCK_HARDNESS, RESISTANCE).isRedstoneConductor((a,b,c) -> true));
+    }
+
+    public MultiPistonBlock(final Properties properties)
+    {
+        super(properties);
     }
 
     /**
@@ -92,6 +100,12 @@ public class MultiPistonBlock extends BaseEntityBlock
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull final Level level, @NotNull final BlockState state, @NotNull final BlockEntityType<T> type)
     {
         return createTickerHelper(type, ModTileEntities.multipiston.get(), (l, pos, s, te) -> te.tick());
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec()
+    {
+        return CODEC;
     }
 
     @NotNull

@@ -6,7 +6,7 @@
 # The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
 modLoader="javafml" #mandatory
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[38,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
+loaderVersion="${fmlRange}"
 # The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
 # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
 license="gpl"
@@ -36,34 +36,33 @@ description='''
 Piston unlimited adds the multipiston block which allows you to move any block with a handy GUI into any direction!
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-[[dependencies.multipiston]] #optional
-    # the modid of the dependency
-    modId="forge" #mandatory
-    # Does this dependency have to exist - if not, ordering below must be specified
-    mandatory=true #mandatory
-    # The version range of the dependency
-    versionRange="[41.0.94,)" #mandatory
-    # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
+[[dependencies.multipiston]]
+    modId="neoforge"
+    type="required"
+    versionRange="${forgeRange}"
     ordering="NONE"
-    # Side this dependency is applied on - BOTH, CLIENT or SERVER
     side="BOTH"
-# Here's another dependency
 [[dependencies.multipiston]]
     modId="minecraft"
-    mandatory=true
-# This version range declares a minimum of the current minecraft version up to but not including the next major version
-    versionRange="[1.20,1.21)"
+    type="required"
+    versionRange="${minecraftRange}"
     ordering="NONE"
     side="BOTH"
 [[dependencies.multipiston]]
-     modId="blockui"
-     mandatory=true
-     versionRange="[0.0.59-ALPHA,)"
-     ordering="AFTER"
-     side="BOTH"
+    modId="blockui"
+    type="required"
+    versionRange="${blockUiRange}"
+    ordering="AFTER"
+    side="BOTH"
+[[dependencies.multipiston]]
+    modId="domum_ornamentum"
+    type="required"
+    versionRange="${domumOrnamentumRange}"
+    ordering="AFTER"
+    side="BOTH"
 [[dependencies.multipiston]]
     modId="structurize"
-    mandatory=true
-    versionRange="[1.19-1.0.420-ALPHA, )"
+    type="required"
+    versionRange="${structurizeRange}"
     ordering="AFTER"
     side="BOTH"

@@ -1,9 +1,11 @@
 package com.ldtteam.multipiston;
 
 import com.google.common.primitives.Ints;
-import com.ldtteam.structurize.api.util.IRotatableBlockEntity;
+import com.ldtteam.structurize.api.IRotatableBlockEntity;
+import com.ldtteam.structurize.api.RotationMirror;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -15,7 +17,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -185,7 +186,7 @@ public class TileEntityMultiPiston extends BlockEntity implements IRotatableBloc
                   || blockToMove.getPistonPushReaction() == PushReaction.IGNORE
                   || blockToMove.getPistonPushReaction() == PushReaction.DESTROY
                   || blockToMove.getPistonPushReaction() == PushReaction.BLOCK
-                  || (blockToMove.getBlock() instanceof EntityBlock && !ForgeRegistries.BLOCKS.getKey(blockToMove.getBlock()).getNamespace().equals("domum_ornamentum"))
+                  || (blockToMove.getBlock() instanceof EntityBlock && !BuiltInRegistries.BLOCK.getKey(blockToMove.getBlock()).getNamespace().equals("domum_ornamentum"))
                   || blockToMove.getBlock() == Blocks.BEDROCK)
             {
                 progress++;
@@ -210,7 +211,7 @@ public class TileEntityMultiPiston extends BlockEntity implements IRotatableBloc
                         level.setBlock(posToGo, tempState, 67);
                         if (tempState.getBlock() instanceof BucketPickup)
                         {
-                            ((BucketPickup) tempState.getBlock()).pickupBlock(level, posToGo, tempState);
+                            ((BucketPickup) tempState.getBlock()).pickupBlock(null, level, posToGo, tempState);
                         }
                         this.level.neighborChanged(posToGo, tempState.getBlock(), posToGo);
 
@@ -253,39 +254,28 @@ public class TileEntityMultiPiston extends BlockEntity implements IRotatableBloc
         }
     }
 
-    /**
-     * Our own rotate method.
-     * @param rotationIn the incoming rotation.
-     */
     @Override
-    public void rotate(final Rotation rotationIn)
+    public void rotateAndMirror(final RotationMirror rotationMirror)
     {
         if (output != UP && output != DOWN)
         {
-            output = rotationIn.rotate(output);
+            output = rotationMirror.mirror().mirror(output);
         }
 
         if (input != UP && input != DOWN)
         {
-            input = rotationIn.rotate(input);
+            input = rotationMirror.mirror().mirror(input);
         }
-    }
 
-    /**
-     * Our own mirror method.
-     * @param mirrorIn the incoming mirror.
-     */
-    @Override
-    public void mirror(final Mirror mirrorIn)
-    {
+
         if (output != UP && output != DOWN)
         {
-            output = mirrorIn.mirror(output);
+            output = rotationMirror.rotation().rotate(output);
         }
 
         if (input != UP && input != DOWN)
         {
-            input = mirrorIn.mirror(input);
+            input = rotationMirror.rotation().rotate(input);
         }
     }
 

@@ -1,21 +1,26 @@
 package com.ldtteam.multipiston.network;
 
+import com.ldtteam.common.network.AbstractServerPlayMessage;
+import com.ldtteam.common.network.PlayMessageType;
 import com.ldtteam.multipiston.TileEntityMultiPiston;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.network.NetworkEvent;
-import org.jetbrains.annotations.Nullable;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+
+import static com.ldtteam.multipiston.MultiPiston.MOD_ID;
 
 /**
  * Message class which handles updating the minecolonies multipiston.
  */
-public class MultiPistonChangeMessage implements IMessage
+public class MultiPistonChangeMessage extends AbstractServerPlayMessage
 {
+    public static final PlayMessageType<?> TYPE = PlayMessageType.forServer(MOD_ID, "multi_piston_change", MultiPistonChangeMessage::new);
+
     /**
      * The direction it should push or pull rom.
      */
@@ -44,9 +49,14 @@ public class MultiPistonChangeMessage implements IMessage
     /**
      * Empty public constructor.
      */
-    public MultiPistonChangeMessage()
+    public MultiPistonChangeMessage(final FriendlyByteBuf buf, final PlayMessageType<?> type)
     {
-
+        super(buf, type);
+        this.pos = buf.readBlockPos();
+        this.input = Direction.values()[buf.readInt()];
+        this.output = Direction.values()[buf.readInt()];
+        this.range = buf.readInt();
+        this.speed = buf.readInt();
     }
 
     /**
@@ -59,6 +69,7 @@ public class MultiPistonChangeMessage implements IMessage
      */
     public MultiPistonChangeMessage(final BlockPos pos, final Direction input, final Direction output, final int range, final int speed)
     {
+        super(TYPE);
         this.pos = pos;
         this.input = input;
         this.range = range;
@@ -77,33 +88,16 @@ public class MultiPistonChangeMessage implements IMessage
     }
 
     @Override
-    public void fromBytes(final FriendlyByteBuf buf)
+    protected void onExecute(final PlayPayloadContext context, final ServerPlayer player)
     {
-        this.pos = buf.readBlockPos();
-        this.input = Direction.values()[buf.readInt()];
-        this.output = Direction.values()[buf.readInt()];
-        this.range = buf.readInt();
-        this.speed = buf.readInt();
-    }
-
-    @Nullable
-    @Override
-    public LogicalSide getExecutionSide()
-    {
-        return LogicalSide.SERVER;
-    }
-
-    @Override
-    public void onExecute(final NetworkEvent.Context ctxIn, final boolean isLogicalServer)
-    {
-        final Level world = ctxIn.getSender().level();
+        final Level world = player.level();
         final BlockEntity entity = world.getBlockEntity(pos);
-        if (entity instanceof TileEntityMultiPiston)
+        if (entity instanceof TileEntityMultiPiston multiPiston)
         {
-            ((TileEntityMultiPiston) entity).setInput(input);
-            ((TileEntityMultiPiston) entity).setOutput(output);
-            ((TileEntityMultiPiston) entity).setRange(range);
-            ((TileEntityMultiPiston) entity).setSpeed(speed);
+            multiPiston.setInput(input);
+            multiPiston.setOutput(output);
+            multiPiston.setRange(range);
+            multiPiston.setSpeed(speed);
             final BlockState state = world.getBlockState(pos);
             world.sendBlockUpdated(pos, state, state, 0x3);
         }

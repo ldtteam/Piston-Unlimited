@@ -1,4 +1,5 @@
 {
   "block.multipiston.multipistonblock": "Multi-Piston",
-  "com.ldtteam.multipiston.equalpos": "Input and Output Direction can't be the same!"
+  "com.ldtteam.multipiston.equalpos": "Input and Output Direction can't be the same!",
+  "itemGroup.multipiston": "Multi-Piston"
 }
