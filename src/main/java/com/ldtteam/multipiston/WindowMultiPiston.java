@@ -247,12 +247,12 @@ public class WindowMultiPiston extends AbstractWindowSkeleton
         }
 
         final BlockEntity block = Minecraft.getInstance().level.getBlockEntity(pos);
-        if (block instanceof TileEntityMultiPiston)
+        if (block instanceof TileEntityMultiPiston multiPiston)
         {
-            ((TileEntityMultiPiston) block).setSpeed(speed);
-            ((TileEntityMultiPiston) block).setRange(range);
-            ((TileEntityMultiPiston) block).setOutput(output);
-            ((TileEntityMultiPiston) block).setInput(input);
+            multiPiston.setSpeed(speed);
+            multiPiston.setRange(range);
+            multiPiston.setOutput(output);
+            multiPiston.setInput(input);
         }
 
         new MultiPistonChangeMessage(pos, input, output, range, speed).sendToServer();
