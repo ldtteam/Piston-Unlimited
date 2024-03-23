@@ -32,7 +32,7 @@ project {
         password("env.crowdinKey", "credentialsJSON:444bd785-791b-42ae-9fae-10ee93a2fbd3")
         select("Current Minecraft Version", "main", label = "Current Minecraft Version",
                 options = listOf("1.12", "1.13", "1.14", "1.15", "1.16", "1.17, 1.19, 1.20"))
-        text("Repository", "ldtteam/Piston-Unlimited", label = "Repository", description = "The repository for minecolonies.", readOnly = true, allowEmpty = true)
+        text("Repository", "ldtteam/Piston-Unlimited", label = "Repository", description = "The repository for multipiston.", readOnly = true, allowEmpty = true)
         param("env.Version.Minor", "2")
         param("env.Version.Patch", "0")
         param("Upsource.Project.Id", "multipiston")
@@ -44,8 +44,8 @@ project {
     features {
         githubIssues {
             id = "PROJECT_EXT_36"
-            displayName = "ldtteam/minecolonies"
-            repositoryURL = "https://github.com/ldtteam/minecolonies"
+            displayName = "ldtteam/Piston-Unlimited"
+            repositoryURL = "https://github.com/ldtteam/Piston-Unlimited"
             authType = accessToken {
                 accessToken = "credentialsJSON:47381468-aceb-4992-93c9-1ccd4d7aa67f"
             }
@@ -64,7 +64,7 @@ project {
 
 object Beta : Project({
     name = "Beta"
-    description = "Beta version builds of domum ornamentum"
+    description = "Beta version builds of piston unlimited"
 
     buildType(Beta_Release)
 
@@ -156,7 +156,7 @@ object OfficialPublications : Project({
 object OfficialPublications_CommonB : BuildType({
     templates(AbsoluteId("LetSDevTogether_CommonBuildCounter"))
     name = "Common Build Counter"
-    description = "Represents the version counter within Minecolonies for official releases."
+    description = "Represents the version counter within piston unlimited for official releases."
 })
 
 
@@ -214,7 +214,7 @@ object PullRequests2_CommonBuildCounter : BuildType({
 
 object Release : Project({
     name = "Release"
-    description = "Beta version builds of domum ornamentum"
+    description = "Beta version builds of piston unlimited"
 
     buildType(Release_Release)
 
