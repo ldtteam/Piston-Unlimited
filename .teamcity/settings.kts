@@ -30,7 +30,7 @@ project {
 
     params {
         password("env.crowdinKey", "credentialsJSON:444bd785-791b-42ae-9fae-10ee93a2fbd3")
-        select("Current Minecraft Version", "latest", label = "Current Minecraft Version",
+        select("Current Minecraft Version", "main", label = "Current Minecraft Version",
                 options = listOf("1.12", "1.13", "1.14", "1.15", "1.16", "1.17, 1.19, 1.20"))
         text("Repository", "ldtteam/Piston-Unlimited", label = "Repository", description = "The repository for minecolonies.", readOnly = true, allowEmpty = true)
         param("env.Version.Minor", "2")
