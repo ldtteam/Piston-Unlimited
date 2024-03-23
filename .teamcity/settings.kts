@@ -125,17 +125,6 @@ object Beta_Release : BuildType({
             successfulOnly = true
             branchFilter = ""
         }
-        commitStatusPublisher {
-            id = "BUILD_EXT_15"
-            enabled = false
-            vcsRootExtId = "${DslContext.settingsRoot.id}"
-            publisher = upsource {
-                serverUrl = "https://code-analysis.ldtteam.com"
-                projectId = "%Upsource.Project.Id%"
-                userName = "upsource"
-                password = "credentialsJSON:f19631a7-1bc1-4a66-88a0-dc2b9cd36734"
-            }
-        }
     }
 
     dependencies {
@@ -198,17 +187,6 @@ object Release_Release : BuildType({
             labelingPattern = "%env.Version%"
             successfulOnly = true
             branchFilter = ""
-        }
-        commitStatusPublisher {
-            id = "BUILD_EXT_15"
-            enabled = false
-            vcsRootExtId = "${DslContext.settingsRoot.id}"
-            publisher = upsource {
-                serverUrl = "https://code-analysis.ldtteam.com"
-                projectId = "%Upsource.Project.Id%"
-                userName = "upsource"
-                password = "credentialsJSON:f19631a7-1bc1-4a66-88a0-dc2b9cd36734"
-            }
         }
     }
 
