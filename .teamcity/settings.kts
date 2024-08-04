@@ -124,7 +124,7 @@ object Beta_Release : BuildType({
             labelingPattern = "%env.Version%"
             successfulOnly = true
             branchFilter = ""
-        }
+        }st
     }
 
     dependencies {

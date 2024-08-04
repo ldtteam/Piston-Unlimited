@@ -5,12 +5,12 @@ import com.ldtteam.blockui.controls.TextField;
 import com.ldtteam.blockui.mod.Log;
 import com.ldtteam.blockui.views.DropDownList;
 import com.ldtteam.multipiston.network.MultiPistonChangeMessage;
-import com.ldtteam.multipiston.network.Network;
-import com.ldtteam.structurize.api.util.Utils;
+import com.ldtteam.structurize.api.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -161,9 +161,9 @@ public class WindowMultiPiston extends AbstractWindowSkeleton
             }
 
             @Override
-            public String getLabel(final int index)
+            public MutableComponent getLabel(final int index)
             {
-                return COLORS.get(index);
+                return Component.literal(COLORS.get(index));
             }
         });
 
@@ -178,9 +178,9 @@ public class WindowMultiPiston extends AbstractWindowSkeleton
             }
 
             @Override
-            public String getLabel(final int index)
+            public MutableComponent getLabel(final int index)
             {
-                return COLORS.get(index);
+                return Component.literal(COLORS.get(index));
             }
         });
     }
@@ -255,7 +255,7 @@ public class WindowMultiPiston extends AbstractWindowSkeleton
             ((TileEntityMultiPiston) block).setInput(input);
         }
 
-        Network.getNetwork().sendToServer(new MultiPistonChangeMessage(pos, input, output, range, speed));
+        new MultiPistonChangeMessage(pos, input, output, range, speed).sendToServer();
         close();
     }
 }
