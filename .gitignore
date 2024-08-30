@@ -1,9 +1,27 @@
+# eclipse
+/.vscode
+/bin
+*.launch
+/.settings
+/.metadata
+/.classpath
+/.project
 
-build/
+# idea
+/out
+*.ipr
+*.iws
+*.iml
+/.idea
 
-.idea/
+# gradle
+/build
+/.gradle
 
-.gradle/
+# other
+/eclipse
+/run*
+/libs
+/logs
 
-run/
-runs/
+/gradle/local.gradle
