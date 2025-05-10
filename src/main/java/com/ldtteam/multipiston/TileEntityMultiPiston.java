@@ -271,6 +271,18 @@ public class TileEntityMultiPiston extends BlockEntity implements IRotatableBloc
         }
     }
 
+    @Override
+    public BlockState rotate(final BlockState state, final LevelAccessor levelAccessor, final BlockPos pos, final Rotation rotation)
+    {
+        if (rotation == Rotation.NONE)
+            return state;
+
+        getBlockEntity(levelAccessor, pos)
+                .ifPresent(e -> e.rotate(Direction.Axis.Y, 4 - rotation.ordinal()));
+
+        return state;
+    }
+
     /**
      * Our own mirror method.
      * @param mirrorIn the incoming mirror.
