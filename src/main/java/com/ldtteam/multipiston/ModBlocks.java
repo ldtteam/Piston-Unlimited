@@ -1,5 +1,8 @@
 package com.ldtteam.multipiston;
 
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -15,6 +18,8 @@ import static com.ldtteam.multipiston.MultiPiston.MOD_ID;
 
 public class ModBlocks
 {
+    public static final TagKey<Block> MOVEABLE_ENTITY_BLOCKS = BlockTags.create(new ResourceLocation(MOD_ID, "moveable_entity_blocks"));
+
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MOD_ID);
     public static final     DeferredRegister<Item>  ITEMS  = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
 

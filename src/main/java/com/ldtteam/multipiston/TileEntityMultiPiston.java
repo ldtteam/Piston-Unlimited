@@ -185,12 +185,14 @@ public class TileEntityMultiPiston extends BlockEntity implements IRotatableBloc
                   || blockToMove.getPistonPushReaction() == PushReaction.IGNORE
                   || blockToMove.getPistonPushReaction() == PushReaction.DESTROY
                   || blockToMove.getPistonPushReaction() == PushReaction.BLOCK
-                  || (blockToMove.getBlock() instanceof EntityBlock && !ForgeRegistries.BLOCKS.getKey(blockToMove.getBlock()).getNamespace().equals("domum_ornamentum"))
+                  || (blockToMove.getBlock() instanceof EntityBlock
+                && !ForgeRegistries.BLOCKS.getKey(blockToMove.getBlock()).getNamespace().equals("domum_ornamentum")) && !blockToMove.is(ModBlocks.MOVEABLE_ENTITY_BLOCKS)
                   || blockToMove.getBlock() == Blocks.BEDROCK)
             {
                 progress++;
                 return;
             }
+
 
             for (int i = 0; i < Math.min(range, MAX_RANGE); i++)
             {
@@ -228,7 +230,8 @@ public class TileEntityMultiPiston extends BlockEntity implements IRotatableBloc
                             }
                         }
 
-                        level.removeBlock(posToGoFrom, false);
+                        level.removeBlockEntity(posToGoFrom);
+                        level.removeBlock(posToGoFrom, true);
                     }
                 }
             }
@@ -269,18 +272,6 @@ public class TileEntityMultiPiston extends BlockEntity implements IRotatableBloc
         {
             input = rotationIn.rotate(input);
         }
-    }
-
-    @Override
-    public BlockState rotate(final BlockState state, final LevelAccessor levelAccessor, final BlockPos pos, final Rotation rotation)
-    {
-        if (rotation == Rotation.NONE)
-            return state;
-
-        getBlockEntity(levelAccessor, pos)
-                .ifPresent(e -> e.rotate(Direction.Axis.Y, 4 - rotation.ordinal()));
-
-        return state;
     }
 
     /**
