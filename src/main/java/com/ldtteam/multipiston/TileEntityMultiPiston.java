@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
+import net.neoforged.neoforge.event.level.PistonEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -187,12 +188,14 @@ public class TileEntityMultiPiston extends BlockEntity implements IRotatableBloc
                   || blockToMove.getPistonPushReaction() == PushReaction.IGNORE
                   || blockToMove.getPistonPushReaction() == PushReaction.DESTROY
                   || blockToMove.getPistonPushReaction() == PushReaction.BLOCK
-                  || (blockToMove.getBlock() instanceof EntityBlock && !BuiltInRegistries.BLOCK.getKey(blockToMove.getBlock()).getNamespace().equals("domum_ornamentum"))
+                  || (blockToMove.getBlock() instanceof EntityBlock
+                && !BuiltInRegistries.BLOCK.getKey(blockToMove.getBlock()).getNamespace().equals("domum_ornamentum")) && !blockToMove.is(ModBlocks.MOVEABLE_ENTITY_BLOCKS)
                   || blockToMove.getBlock() == Blocks.BEDROCK)
             {
                 progress++;
                 return;
             }
+
 
             for (int i = 0; i < Math.min(range, MAX_RANGE); i++)
             {
@@ -230,7 +233,8 @@ public class TileEntityMultiPiston extends BlockEntity implements IRotatableBloc
                             }
                         }
 
-                        level.removeBlock(posToGoFrom, false);
+                        level.removeBlockEntity(posToGoFrom);
+                        level.removeBlock(posToGoFrom, true);
                     }
                 }
             }
