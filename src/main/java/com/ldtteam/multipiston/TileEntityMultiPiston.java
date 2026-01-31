@@ -7,6 +7,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -185,8 +186,7 @@ public class TileEntityMultiPiston extends BlockEntity implements IRotatableBloc
                   || blockToMove.getPistonPushReaction() == PushReaction.IGNORE
                   || blockToMove.getPistonPushReaction() == PushReaction.DESTROY
                   || blockToMove.getPistonPushReaction() == PushReaction.BLOCK
-                  || (blockToMove.getBlock() instanceof EntityBlock
-                && !ForgeRegistries.BLOCKS.getKey(blockToMove.getBlock()).getNamespace().equals("domum_ornamentum")) && !blockToMove.is(ModBlocks.MOVEABLE_ENTITY_BLOCKS)
+                  || isDisallowedEntityBlock(blockToMove)
                   || blockToMove.getBlock() == Blocks.BEDROCK)
             {
                 progress++;
@@ -254,6 +254,32 @@ public class TileEntityMultiPiston extends BlockEntity implements IRotatableBloc
         {
             entity.teleportTo(posTo.getX() + 0.5D, posTo.getY() + 0.5D, posTo.getZ() + 0.5D);
         }
+    }
+
+    private boolean isDisallowedEntityBlock(final BlockState state)
+    {
+        if (!(state.getBlock() instanceof EntityBlock))
+        {
+            return false;
+        }
+
+        final ResourceLocation blockId = ForgeRegistries.BLOCKS.getKey(state.getBlock());
+        if (blockId == null)
+        {
+            return true;
+        }
+
+        if ("domum_ornamentum".equals(blockId.getNamespace()))
+        {
+            return false;
+        }
+
+        if (state.is(ModBlocks.MOVEABLE_ENTITY_BLOCKS))
+        {
+            return false;
+        }
+
+        return !MultiPistonConfig.isAllowedEntityBlock(blockId);
     }
 
     /**
