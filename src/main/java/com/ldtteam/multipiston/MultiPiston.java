@@ -37,6 +37,7 @@ public class MultiPiston
 
     public MultiPiston()
     {
+        MultiPistonConfig.register();
         BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
         ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
         TILE_ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
