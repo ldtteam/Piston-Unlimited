@@ -4,7 +4,7 @@ import com.ldtteam.blockui.controls.Button;
 import com.ldtteam.blockui.controls.ButtonHandler;
 import com.ldtteam.blockui.mod.Log;
 import com.ldtteam.blockui.views.BOWindow;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -25,7 +25,7 @@ public abstract class AbstractWindowSkeleton extends BOWindow implements ButtonH
      */
     public AbstractWindowSkeleton(final String resource)
     {
-        super(ResourceLocation.parse(resource));
+        super(Identifier.parse(resource));
 
         buttons = new HashMap<>();
     }

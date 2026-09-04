@@ -1,84 +1,55 @@
 package com.ldtteam.multipiston.network;
 
-import com.ldtteam.common.network.AbstractServerPlayMessage;
-import com.ldtteam.common.network.PlayMessageType;
+import com.ldtteam.multipiston.MultiPiston;
 import com.ldtteam.multipiston.TileEntityMultiPiston;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import static com.ldtteam.multipiston.MultiPiston.MOD_ID;
-
 /**
- * Message class which handles updating the multipiston.
+ * Serverbound update for a multi-piston block entity.
  */
-public class MultiPistonChangeMessage extends AbstractServerPlayMessage
+public record MultiPistonChangeMessage(
+    BlockPos pos,
+    Direction input,
+    Direction output,
+    int range,
+    int speed
+) implements CustomPacketPayload
 {
-    public static final PlayMessageType<?> TYPE = PlayMessageType.forServer(MOD_ID, "change_msg", MultiPistonChangeMessage::new);
+    public static final Type<MultiPistonChangeMessage> ID =
+        new Type<>(Identifier.fromNamespaceAndPath(MultiPiston.MOD_ID, "change_message"));
 
-    /**
-     * The direction it should push or pull rom.
-     */
-    private Direction input;
+    public static final StreamCodec<RegistryFriendlyByteBuf, MultiPistonChangeMessage> CODEC =
+        CustomPacketPayload.codec(MultiPistonChangeMessage::write, MultiPistonChangeMessage::read);
 
-    /**
-     * The direction it should push or pull rom.
-     */
-    private Direction output;
-
-    /**
-     * The range it should pull to.
-     */
-    private int range;
-
-    /**
-     * The speed it should have.
-     */
-    private int speed;
-
-    /**
-     * The position of the tileEntity.
-     */
-    private BlockPos pos;
-
-    /**
-     * Empty public constructor.
-     */
-    public MultiPistonChangeMessage(final RegistryFriendlyByteBuf buf, final PlayMessageType<?> type)
+    private MultiPistonChangeMessage(final FriendlyByteBuf buf)
     {
-        super(buf, type);
-        this.pos = buf.readBlockPos();
-        this.input = Direction.values()[buf.readInt()];
-        this.output = Direction.values()[buf.readInt()];
-        this.range = buf.readInt();
-        this.speed = buf.readInt();
+        this(
+            buf.readBlockPos(),
+            Direction.values()[buf.readInt()],
+            Direction.values()[buf.readInt()],
+            buf.readInt(),
+            buf.readInt()
+        );
     }
 
-    /**
-     * Constructor to create the 
-     * @param pos the position of the block.
-     * @param input the way it inputs from.
-     * @param output the way it will output to.
-     * @param range the range it should work.
-     * @param speed the speed it should have.
-     */
-    public MultiPistonChangeMessage(final BlockPos pos, final Direction input, final Direction output, final int range, final int speed)
+    private static MultiPistonChangeMessage read(final FriendlyByteBuf buf)
     {
-        super(TYPE);
-        this.pos = pos;
-        this.input = input;
-        this.range = range;
-        this.output = output;
-        this.speed = speed;
+        return new MultiPistonChangeMessage(buf);
     }
 
-    @Override
-    public void toBytes(final RegistryFriendlyByteBuf buf)
+    private void write(final FriendlyByteBuf buf)
     {
         buf.writeBlockPos(pos);
         buf.writeInt(input.ordinal());
@@ -88,18 +59,38 @@ public class MultiPistonChangeMessage extends AbstractServerPlayMessage
     }
 
     @Override
-    protected void onExecute(final IPayloadContext context, final ServerPlayer playerEntity)
+    public Type<MultiPistonChangeMessage> type()
     {
-        final Level world = playerEntity.level();
-        final BlockEntity entity = world.getBlockEntity(pos);
-        if (entity instanceof TileEntityMultiPiston)
+        return ID;
+    }
+
+    public void sendToServer()
+    {
+        ClientPacketDistributor.sendToServer(this);
+    }
+
+    public static void onExecute(final MultiPistonChangeMessage message, final IPayloadContext context)
+    {
+        if (!(context.player() instanceof final ServerPlayer player))
         {
-            ((TileEntityMultiPiston) entity).setInput(input);
-            ((TileEntityMultiPiston) entity).setOutput(output);
-            ((TileEntityMultiPiston) entity).setRange(range);
-            ((TileEntityMultiPiston) entity).setSpeed(speed);
-            final BlockState state = world.getBlockState(pos);
-            world.sendBlockUpdated(pos, state, state, 0x3);
+            return;
+        }
+
+        context.enqueueWork(() -> applyOnMainThread(message, player));
+    }
+
+    private static void applyOnMainThread(final MultiPistonChangeMessage message, final ServerPlayer player)
+    {
+        final Level world = player.level();
+        final BlockEntity entity = world.getBlockEntity(message.pos());
+        if (entity instanceof TileEntityMultiPiston piston)
+        {
+            piston.setInput(message.input());
+            piston.setOutput(message.output());
+            piston.setRange(message.range());
+            piston.setSpeed(message.speed());
+            final BlockState state = world.getBlockState(message.pos());
+            world.sendBlockUpdated(message.pos(), state, state, 0x3);
         }
     }
 }

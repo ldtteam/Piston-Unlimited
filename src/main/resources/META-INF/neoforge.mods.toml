@@ -1,42 +1,48 @@
-modLoader="javafml" #mandatory
-loaderVersion="${fml_range}" #mandatory
+modLoader="javafml"
+loaderVersion="${fml_range}"
 license="GPL3"
-issueTrackerURL="https://github.com/ldtteam/Piston-Unlimited/issues/new/choose" #optional
+issueTrackerURL="https://github.com/ldtteam/Piston-Unlimited/issues"
 
-# A list of mods - how many allowed here is determined by the individual mod loader
-[[mods]] #mandatory
-modId="multipiston" #mandatory
-version="${version}" #mandatory
-displayName="Multi-Piston" #mandatory
-logoFile="examplemod.png" #optional
-credits="Thanks for this example mod goes to Java" #optional
-authors="Let's Dev Together Team" #optional
+[[mods]]
+modId="multipiston"
+version="${file.jarVersion}"
+displayName="Multi-Piston"
+authors="LDT Team"
 description='''
-Piston unlimited adds the multipiston block which allows you to move any block with a handy GUI into any direction!
+Multi-Piston adds a configurable piston block which can move blocks in any direction.
 '''
 
-# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-[[dependencies.multipiston]] #optional
-modId="neoforge" #mandatory
-type="required" #mandatory
-versionRange="${forge_range}" #mandatory
-ordering="NONE"
-side="BOTH"
 [[dependencies.multipiston]]
-modId="minecraft"
-type="required"
-versionRange="${minecraft_range}"
-ordering="NONE"
-side="BOTH"
+    modId="neoforge"
+    type="required"
+    versionRange="${neoforge_range}"
+    ordering="NONE"
+    side="BOTH"
+
 [[dependencies.multipiston]]
-modId="blockui"
-type="required"
-versionRange="[${blockUiVersion}, )"
-ordering="AFTER"
-side="BOTH"
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_range}"
+    ordering="NONE"
+    side="BOTH"
+
 [[dependencies.multipiston]]
-modId="structurize"
-type="required"
-versionRange="[${structurizeVersion}, )"
-ordering="AFTER"
-side="BOTH"
+    modId="blockui"
+    type="required"
+    versionRange="[0.0.1,)"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.multipiston]]
+    modId="structurize"
+    type="required"
+    versionRange="[0.0.1,)"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.multipiston]]
+    modId="domum_ornamentum"
+    type="required"
+    versionRange="[1.0.0,)"
+    ordering="AFTER"
+    side="BOTH"

@@ -2,14 +2,16 @@ package com.ldtteam.multipiston;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -23,38 +25,40 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * This Class is about the multipiston which takes care of pushing others around (In a non mean way).
+ * The configurable piston block.
  */
-public class MultiPistonBlock extends BaseEntityBlock
+public final class MultiPistonBlock extends BaseEntityBlock
 {
-    /**
-     * The hardness this block has.
-     */
-    private static final float BLOCK_HARDNESS = 1F;
+    public static final MapCodec<MultiPistonBlock> CODEC = simpleCodec(MultiPistonBlock::new);
 
-    /**
-     * The resistance this block has.
-     */
-    private static final float RESISTANCE = 1F;
-
-    /**
-     * Constructor for the Substitution block.
-     * sets the creative tab, as well as the resistance and the hardness.
-     */
-    public MultiPistonBlock()
-    {
-        super(Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).strength(BLOCK_HARDNESS, RESISTANCE).isRedstoneConductor((a,b,c) -> true));
-    }
-
-    /**
-     * The blocks shape.
-     */
+    private static final float BLOCK_HARDNESS = 1.0F;
+    private static final float RESISTANCE = 1.0F;
     private static final VoxelShape SHAPE = Block.box(0.01D, 0.01D, 0.01D, 15.99D, 15.99D, 15.99D);
 
-    @Override
-    protected InteractionResult useWithoutItem(final BlockState state, final Level level, final BlockPos pos, final Player player, final BlockHitResult hitResult)
+    public MultiPistonBlock(final Properties properties)
     {
-        if (level.isClientSide)
+        super(properties.mapColor(MapColor.STONE)
+            .sound(SoundType.STONE)
+            .strength(BLOCK_HARDNESS, RESISTANCE)
+            .isRedstoneConductor((state, level, pos) -> true));
+    }
+
+    @Override
+    protected MapCodec<MultiPistonBlock> codec()
+    {
+        return CODEC;
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(
+        @NotNull final BlockState state,
+        @NotNull final Level level,
+        @NotNull final BlockPos pos,
+        @NotNull final Player player,
+        @NotNull final BlockHitResult hitResult
+    )
+    {
+        if (level.isClientSide())
         {
             new WindowMultiPiston(pos).open();
         }
@@ -62,73 +66,69 @@ public class MultiPistonBlock extends BaseEntityBlock
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(
-      final ItemStack stack,
-      final BlockState state,
-      final Level level,
-      final BlockPos pos,
-      final Player player,
-      final InteractionHand hand,
-      final BlockHitResult hitResult)
-    {
-        if (level.isClientSide)
-        {
-            new WindowMultiPiston(pos).open();
-        }
-        return ItemInteractionResult.SUCCESS;
-    }
-
-    @NotNull
-    @Override
-    public VoxelShape getCollisionShape(final BlockState state, final BlockGetter level, final BlockPos pos, final CollisionContext ctx)
+    protected VoxelShape getCollisionShape(
+        @NotNull final BlockState state,
+        @NotNull final BlockGetter level,
+        @NotNull final BlockPos pos,
+        @NotNull final CollisionContext context
+    )
     {
         return Shapes.block();
     }
 
     @Override
-    public void neighborChanged(@NotNull final BlockState state, final Level level, @NotNull final BlockPos pos, @NotNull final Block block, @NotNull final BlockPos fromPos, final boolean isMoving)
+    protected void neighborChanged(
+        @NotNull final BlockState state,
+        @NotNull final Level level,
+        @NotNull final BlockPos pos,
+        @NotNull final Block block,
+        @Nullable final Orientation orientation,
+        final boolean movedByPiston
+    )
     {
-        if(level.isClientSide)
+        if (level.isClientSide())
         {
             return;
         }
-        final BlockEntity te = level.getBlockEntity(pos);
-        if(te instanceof TileEntityMultiPiston)
+
+        if (level.getBlockEntity(pos) instanceof TileEntityMultiPiston piston)
         {
-            ((TileEntityMultiPiston) te).handleRedstone(level.hasNeighborSignal(pos));
+            piston.handleRedstone(level.hasNeighborSignal(pos));
         }
     }
 
-    @Nullable
     @Override
-    public BlockEntity newBlockEntity(@NotNull final BlockPos blockPos, @NotNull final BlockState blockState)
+    public BlockEntity newBlockEntity(@NotNull final BlockPos pos, @NotNull final BlockState state)
     {
-        return new TileEntityMultiPiston(blockPos, blockState);
+        return new TileEntityMultiPiston(pos, state);
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull final Level level, @NotNull final BlockState state, @NotNull final BlockEntityType<T> type)
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+        @NotNull final Level level,
+        @NotNull final BlockState state,
+        @NotNull final BlockEntityType<T> type
+    )
     {
-        return createTickerHelper(type, ModTileEntities.multipiston.get(), (l, pos, s, te) -> te.tick());
+        return createTickerHelper(type, ModTileEntities.multipiston.value(), (tickLevel, pos, tickState, piston) -> piston.tick());
     }
 
     @Override
-    protected MapCodec<? extends BaseEntityBlock> codec()
-    {
-        return null;
-    }
-
     @NotNull
-    @Override
-    public RenderShape getRenderShape(@NotNull BlockState state)
+    protected RenderShape getRenderShape(@NotNull final BlockState state)
     {
         return RenderShape.MODEL;
     }
 
-    @NotNull
     @Override
-    public VoxelShape getShape(@NotNull final BlockState state, @NotNull final BlockGetter getter, @NotNull final BlockPos pos, @NotNull final CollisionContext context)
+    @NotNull
+    protected VoxelShape getShape(
+        @NotNull final BlockState state,
+        @NotNull final BlockGetter level,
+        @NotNull final BlockPos pos,
+        @NotNull final CollisionContext context
+    )
     {
         return SHAPE;
     }

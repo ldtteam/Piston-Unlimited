@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "pattern": [
     "SSS",
     "R R",
@@ -19,7 +18,7 @@
     }
   },
   "result": {
-    "id": "multipiston:multipistonblock",
+    "item": "multipiston:multipistonblock",
     "count": 1
   }
 }

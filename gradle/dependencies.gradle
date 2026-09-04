@@ -1,4 +1,0 @@
-dependencies {
-    implementation ("com.ldtteam:blockui:${project.blockUiVersion}")
-    implementation ("com.ldtteam:structurize:${project.structurizeVersion}")
-}

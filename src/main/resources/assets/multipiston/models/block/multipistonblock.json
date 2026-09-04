@@ -8,6 +8,7 @@
 		"7": "block/orange_concrete",
 		"8": "block/red_concrete",
 		"9": "block/purple_concrete",
+		"missing": "block/polished_andesite",
 		"particle": "block/polished_andesite"
 	},
 	"elements": [

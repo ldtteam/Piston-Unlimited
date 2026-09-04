@@ -1,2 +1,80 @@
-apply from: 'https://raw.githubusercontent.com/ldtteam/OperaPublicaCreator/ng7/gradle/mod.gradle'
+tableau {
+    project {
+        group = "com.ldtteam"
+        publisher = "LDTTeam"
+        modId = "multipiston"
+    }
 
+    maven {
+        publishAsLDTTeamMod()
+        publishLocally()
+        pom({
+            usingGnu3License()
+            usingGit()
+        })
+    }
+}
+
+repositories {
+    maven {
+        name = "LocalBlockUI"
+        url = uri(rootProject.layout.projectDirectory.dir("../BlockUI/repo"))
+    }
+    maven {
+        name = "LocalDomumOrnamentum"
+        url = uri(rootProject.layout.projectDirectory.dir("../Domum-Ornamentum/repo"))
+    }
+    maven {
+        name = "LocalStructurize"
+        url = uri(rootProject.layout.projectDirectory.dir("../Structurize/repo"))
+    }
+}
+
+dependencies {
+    implementation "com.ldtteam:blockui:0.0.1-local"
+    implementation "com.ldtteam:domum-ornamentum:1.0.0-local"
+    implementation "com.ldtteam:structurize:0.0.1-local"
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.addAll(["-Xmaxerrs", "1000", "-Xmaxwarns", "1000"])
+}
+
+tasks.matching { it.name == "neoFormPatch" }.configureEach {
+    doFirst {
+        def decompileJar = project.file("build/neoForm/neoFormJoined26.2-2/steps/decompile/outputs.jar")
+        if (!decompileJar.exists()) return
+
+        def workDir = new File(project.buildDir, "onlyin-fix")
+        workDir.deleteDir()
+        workDir.mkdirs()
+
+        def javaFiles = []
+        project.zipTree(decompileJar).visit { details ->
+            if (details.directory || !details.path.endsWith(".java")) return
+            def dest = new File(workDir, details.path)
+            dest.parentFile.mkdirs()
+            details.copyTo(dest)
+            javaFiles << dest
+        }
+
+        javaFiles.each { file ->
+            def text = file.text
+            def fixed = text.replaceAll(
+                /(?m)^( +)@OnlyIn\s*\([^)]*\)\n(\1(?:public |private |protected )?(?:static |final |abstract )?(?:class |interface |record |enum |@interface ))/,
+                '$2'
+            ).replaceAll(
+                /(?m)^(\}+)\n( +(?:public|private|protected)\s+(?:static\s+)?(?:class |interface |record |enum ))/,
+                '$1\n\n$2'
+            )
+            if (fixed != text) file.text = fixed
+        }
+
+        new groovy.ant.AntBuilder().jar(
+            destfile: decompileJar.absolutePath,
+            basedir: workDir,
+            update: true
+        )
+        workDir.deleteDir()
+    }
+}

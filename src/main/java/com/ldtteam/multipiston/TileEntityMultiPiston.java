@@ -1,253 +1,207 @@
 package com.ldtteam.multipiston;
 
 import com.google.common.primitives.Ints;
-import com.ldtteam.structurize.api.IRotatableBlockEntity;
-import com.ldtteam.structurize.api.RotationMirror;
+import com.ldtteam.structurize.api.util.IRotatableBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.BucketPickup;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static net.minecraft.core.Direction.*;
+import static net.minecraft.core.Direction.DOWN;
+import static net.minecraft.core.Direction.UP;
 
 /**
- * This Class is about the multipiston TileEntity which takes care of pushing others around (In a non mean way).
+ * The multi-piston block entity, including its persisted movement configuration.
  */
 public class TileEntityMultiPiston extends BlockEntity implements IRotatableBlockEntity
 {
-    /**
-     * NBT tag constants for multipiston tileEntities.
-     */
-    public static final String TAG_INPUT            = "input";
-    public static final String TAG_RANGE            = "range";
-    public static final String TAG_DIRECTION        = "direction";
-    public static final String TAG_LENGTH           = "length";
-    public static final String TAG_PROGRESS         = "progress";
+    public static final String TAG_INPUT = "input";
+    public static final String TAG_RANGE = "range";
+    public static final String TAG_DIRECTION = "direction";
+    public static final String TAG_LENGTH = "length";
+    public static final String TAG_PROGRESS = "progress";
     public static final String TAG_OUTPUT_DIRECTION = "outputDirection";
-    public static final String TAG_SPEED            = "speed";
+    public static final String TAG_SPEED = "speed";
 
-    /**
-     * Volume to play at.
-     */
-    public static final double VOLUME = 0.5D;
-
-    /**
-     * The base pitch, add more to this to change the sound.
-     */
-    public static final double PITCH = 0.8D;
-
-    /**
-     * Max block range.
-     */
+    private static final double VOLUME = 0.5D;
+    private static final double PITCH = 0.8D;
     private static final int MAX_RANGE = 10;
-
-    /**
-     * Max block speed.
-     */
     private static final int MAX_SPEED = 3;
-
-    /**
-     * Min block speed.
-     */
     private static final int MIN_SPEED = 1;
-
-    /**
-     * Default gate and bridge range.
-     */
     public static final int DEFAULT_RANGE = 3;
-
-    /**
-     * Default gate and bridge range.
-     */
     public static final int DEFAULT_SPEED = 2;
 
-    /**
-     * The last redstone state which got in.
-     */
-    private boolean on = false;
-
-    /**
-     * The direction it should push or pull rom.
-     */
+    private boolean on;
     private Direction input = UP;
-
-    /**
-     * The output direction.
-     */
     private Direction output = DOWN;
-
-    /**
-     * The range it should pull to.
-     */
     private int range = DEFAULT_RANGE;
-
-    /**
-     * The direction it is going to.
-     */
     private Direction currentDirection;
-
-    /**
-     * The progress it has made.
-     */
-    private int progress = 0;
-
-    /**
-     * Amount of ticks passed.
-     */
-    private int ticksPassed = 0;
-
-    /**
-     * Speed of the multipiston, max 3, min 1.
-     */
-    private int speed = 2;
+    private int progress;
+    private int ticksPassed;
+    private int speed = DEFAULT_SPEED;
 
     public TileEntityMultiPiston(final BlockPos pos, final BlockState state)
     {
-        super(ModTileEntities.multipiston.get(), pos, state);
+        super(ModTileEntities.multipiston.value(), pos, state);
     }
 
-    /**
-     * Handle redstone input.
-     *
-     * @param signal true if positive.
-     */
     public void handleRedstone(final boolean signal)
     {
-        if (speed == 0)
-        {
-            speed = DEFAULT_SPEED;
-        }
-
         if (signal != on && progress == range)
         {
             on = signal;
-            if (signal)
-            {
-                currentDirection = output;
-            }
-            else
-            {
-                currentDirection = input;
-            }
+            currentDirection = signal ? output : input;
             progress = 0;
         }
     }
 
-    /**
-     * Local tick method.
-     */
     public void tick()
     {
-        if (level == null || level.isClientSide)
+        if (level == null || level.isClientSide())
         {
             return;
         }
+
         if (currentDirection == null && progress < range)
         {
             progress = range;
         }
 
-        if (progress < range)
+        if (progress < range && ticksPassed % (20 / speed) == 0)
         {
-            if (ticksPassed % (20 / speed) == 0)
-            {
-                handleTick();
-                ticksPassed = 1;
-            }
+            handleTick();
+            ticksPassed = 1;
+        }
+        else if (progress < range)
+        {
             ticksPassed++;
         }
     }
 
-    /**
-     * Handle the tick, to finish the sliding.
-     */
-    public void handleTick()
+    private void handleTick()
     {
-        final Direction currentOutPutDirection = currentDirection == input ? output : input;
-
-        if (progress < range)
+        if (level == null || currentDirection == null)
         {
-            final BlockState blockToMove = level.getBlockState(worldPosition.relative(currentDirection, 1));
-            if (blockToMove.getBlock() == Blocks.AIR
-                  || blockToMove.getPistonPushReaction() == PushReaction.IGNORE
-                  || blockToMove.getPistonPushReaction() == PushReaction.DESTROY
-                  || blockToMove.getPistonPushReaction() == PushReaction.BLOCK
-                  || (blockToMove.getBlock() instanceof EntityBlock && !BuiltInRegistries.BLOCK.getKey(blockToMove.getBlock()).getNamespace().equals("domum_ornamentum"))
-                  || blockToMove.getBlock() == Blocks.BEDROCK)
-            {
-                progress++;
-                return;
-            }
-
-            for (int i = 0; i < Math.min(range, MAX_RANGE); i++)
-            {
-                final int blockToGoTo = i - 1 - progress + (i - 1 - progress >= 0 ? 1 : 0);
-                final int blockToGoFrom = i + 1 - progress - (i + 1 - progress <= 0 ? 1 : 0);
-
-                final BlockPos posToGo = blockToGoTo > 0 ? worldPosition.relative(currentDirection, blockToGoTo) : worldPosition.relative(currentOutPutDirection, Math.abs(blockToGoTo));
-                final BlockPos posToGoFrom = blockToGoFrom > 0 ? worldPosition.relative(currentDirection, blockToGoFrom) : worldPosition.relative(currentOutPutDirection, Math.abs(blockToGoFrom));
-                if (level.isEmptyBlock(posToGo) || level.getBlockState(posToGo).liquid())
-                {
-                    BlockState tempState = level.getBlockState(posToGoFrom);
-                    if (blockToMove.getBlock() == tempState.getBlock() && level.hasChunkAt(posToGoFrom) && level.hasChunkAt(posToGo))
-                    {
-                        pushEntitiesIfNecessary(posToGo, worldPosition);
-
-                        tempState = Block.updateFromNeighbourShapes(tempState, this.level, posToGo);
-                        level.setBlock(posToGo, tempState, 67);
-                        if (tempState.getBlock() instanceof BucketPickup)
-                        {
-                            ((BucketPickup) tempState.getBlock()).pickupBlock(null, level, posToGo, tempState);
-                        }
-                        this.level.neighborChanged(posToGo, tempState.getBlock(), posToGo);
-
-                        if (tempState.getBlock() instanceof EntityBlock)
-                        {
-                            final BlockEntity blockEntity = level.getBlockEntity(posToGoFrom);
-                            if (blockEntity != null)
-                            {
-                                final CompoundTag tag = blockEntity.saveWithId(level.registryAccess());
-                                final BlockEntity resultEntity = level.getBlockEntity(posToGo);
-                                if (resultEntity != null)
-                                {
-                                    resultEntity.loadWithComponents(tag, level.registryAccess());
-                                }
-                            }
-                        }
-
-                        level.removeBlock(posToGoFrom, false);
-                    }
-                }
-            }
-            level.playSound(null,
-              worldPosition,
-              SoundEvents.PISTON_EXTEND,
-              SoundSource.BLOCKS,
-              (float) VOLUME,
-              (float) PITCH);
-            progress++;
+            return;
         }
+
+        final Direction currentOutputDirection = currentDirection == input ? output : input;
+        if (progress >= range)
+        {
+            return;
+        }
+
+        final BlockState blockToMove = level.getBlockState(worldPosition.relative(currentDirection, 1));
+        final boolean blocked = blockToMove.getBlock() == Blocks.AIR
+            || blockToMove.getPistonPushReaction() == PushReaction.IGNORE
+            || blockToMove.getPistonPushReaction() == PushReaction.DESTROY
+            || blockToMove.getPistonPushReaction() == PushReaction.BLOCK
+            || blockToMove.getBlock() == Blocks.BEDROCK
+            || (blockToMove.getBlock() instanceof EntityBlock
+                && !"domum_ornamentum".equals(BuiltInRegistries.BLOCK.getKey(blockToMove.getBlock()).getNamespace())
+                && !blockToMove.is(ModBlocks.MOVEABLE_ENTITY_BLOCKS));
+        if (blocked)
+        {
+            progress++;
+            return;
+        }
+
+        for (int i = 0; i < Math.min(range, MAX_RANGE); i++)
+        {
+            final int blockToGoTo = i - 1 - progress + (i - 1 - progress >= 0 ? 1 : 0);
+            final int blockToGoFrom = i + 1 - progress - (i + 1 - progress <= 0 ? 1 : 0);
+            final BlockPos posToGo = blockToGoTo > 0
+                ? worldPosition.relative(currentDirection, blockToGoTo)
+                : worldPosition.relative(currentOutputDirection, Math.abs(blockToGoTo));
+            final BlockPos posToGoFrom = blockToGoFrom > 0
+                ? worldPosition.relative(currentDirection, blockToGoFrom)
+                : worldPosition.relative(currentOutputDirection, Math.abs(blockToGoFrom));
+
+            if ((!level.isEmptyBlock(posToGo) && !level.getBlockState(posToGo).liquid())
+                || level.getBlockState(posToGoFrom).getBlock() != blockToMove.getBlock()
+                || !level.hasChunkAt(posToGoFrom)
+                || !level.hasChunkAt(posToGo))
+            {
+                continue;
+            }
+
+            pushEntitiesIfNecessary(posToGo, worldPosition);
+            BlockState movingState = level.getBlockState(posToGoFrom);
+            movingState = Block.updateFromNeighbourShapes(movingState, level, posToGo);
+            level.setBlock(posToGo, movingState, 67);
+
+            if (movingState.getBlock() instanceof BucketPickup bucketPickup)
+            {
+                bucketPickup.pickupBlock(null, level, posToGo, movingState);
+            }
+            level.neighborChanged(posToGo, movingState.getBlock(), null);
+
+            if (movingState.getBlock() instanceof EntityBlock)
+            {
+                copyBlockEntity(level.getBlockEntity(posToGoFrom), level.getBlockEntity(posToGo));
+            }
+
+            level.removeBlockEntity(posToGoFrom);
+            level.removeBlock(posToGoFrom, true);
+        }
+
+        level.playSound(null, worldPosition, SoundEvents.PISTON_EXTEND, SoundSource.BLOCKS, (float) VOLUME, (float) PITCH);
+        progress++;
     }
 
-    private void pushEntitiesIfNecessary(final BlockPos posToGo, final BlockPos pos)
+    private static void copyBlockEntity(final BlockEntity source, final BlockEntity target)
     {
+        if (source == null || target == null || source.getLevel() == null)
+        {
+            return;
+        }
+
+        final TagValueOutput output = TagValueOutput.createWithContext(
+            ProblemReporter.DISCARDING,
+            source.getLevel().registryAccess()
+        );
+        source.saveWithFullMetadata(output);
+        target.loadWithComponents(TagValueInput.create(
+            ProblemReporter.DISCARDING,
+            source.getLevel().registryAccess(),
+            output.buildResult()
+        ));
+        target.setChanged();
+    }
+
+    private void pushEntitiesIfNecessary(final BlockPos posToGo, final BlockPos sourcePos)
+    {
+        if (level == null)
+        {
+            return;
+        }
+
         final List<Entity> entities = level.getEntitiesOfClass(Entity.class, new AABB(posToGo));
-        final BlockPos vector = posToGo.subtract(pos);
+        final BlockPos vector = posToGo.subtract(sourcePos);
         final BlockPos posTo = posToGo.relative(getNearest(vector.getX(), vector.getY(), vector.getZ()));
         for (final Entity entity : entities)
         {
@@ -255,183 +209,144 @@ public class TileEntityMultiPiston extends BlockEntity implements IRotatableBloc
         }
     }
 
-    @Override
-    public void rotateAndMirror(final RotationMirror rotationMirror)
+    private static Direction getNearest(final double x, final double y, final double z)
     {
-        if (output != UP && output != DOWN)
+        if (Math.abs(y) >= Math.abs(x) && Math.abs(y) >= Math.abs(z))
         {
-            output = rotationMirror.rotation().rotate(output);
+            return y < 0.0D ? DOWN : UP;
         }
-
-        if (input != UP && input != DOWN)
+        if (Math.abs(x) >= Math.abs(z))
         {
-            input = rotationMirror.rotation().rotate(input);
+            return x < 0.0D ? Direction.WEST : Direction.EAST;
         }
+        return z < 0.0D ? Direction.NORTH : Direction.SOUTH;
+    }
 
-        if (output != UP && output != DOWN)
+    @Override
+    public void rotate(@NotNull final Rotation rotation)
+    {
+        if (!isVertical(output))
         {
-            output = rotationMirror.mirror().mirror(output);
+            output = rotation.rotate(output);
         }
-
-        if (input != UP && input != DOWN)
+        if (!isVertical(input))
         {
-            input = rotationMirror.mirror().mirror(input);
+            input = rotation.rotate(input);
         }
     }
 
-    /**
-     * Check if the redstone is on.
-     *
-     * @return true if so.
-     */
+    @Override
+    public void mirror(@NotNull final Mirror mirror)
+    {
+        if (!isVertical(output))
+        {
+            output = mirror.mirror(output);
+        }
+        if (!isVertical(input))
+        {
+            input = mirror.mirror(input);
+        }
+    }
+
+    private static boolean isVertical(final Direction direction)
+    {
+        return direction == UP || direction == DOWN;
+    }
+
     public boolean isOn()
     {
         return on;
     }
 
-    /**
-     * Get the direction the block is facing.
-     *
-     * @return the EnumFacing.
-     */
     public Direction getInput()
     {
         return input;
     }
 
-    /**
-     * Get the output direction the block is facing.
-     *
-     * @return the EnumFacing.
-     */
     public Direction getOutput()
     {
         return output;
     }
 
-    /**
-     * Set the direction it should be facing.
-     *
-     * @param direction the direction.
-     */
     public void setInput(final Direction direction)
     {
         this.input = direction;
     }
 
-    /**
-     * Set the direction it should output to.
-     *
-     * @param output the direction.
-     */
     public void setOutput(final Direction output)
     {
         this.output = output;
     }
 
-    /**
-     * Get the range of blocks it should push.
-     *
-     * @return the range.
-     */
     public int getRange()
     {
         return range;
     }
 
-    /**
-     * Set the range it should push.
-     *
-     * @param range the range.
-     */
-    public void setRange(final int range)
+    public void setRange(final int requestedRange)
     {
-        this.range = Math.min(range, MAX_RANGE);
+        this.range = Math.min(requestedRange, MAX_RANGE);
         this.progress = range;
     }
 
-    /**
-     * Get the speed of the block.
-     *
-     * @return the speed (min 1 max 3).
-     */
     public int getSpeed()
     {
         return speed;
     }
 
-    /**
-     * Setter for speed.
-     *
-     * @param speed the speed to set.
-     */
-    public void setSpeed(final int speed)
+    public void setSpeed(final int requestedSpeed)
     {
-        this.speed = Ints.constrainToRange(speed, MIN_SPEED, MAX_SPEED);
+        this.speed = Ints.constrainToRange(requestedSpeed, MIN_SPEED, MAX_SPEED);
     }
 
     @Override
-    public void loadAdditional(@NotNull final CompoundTag compound, final HolderLookup.Provider provider)
+    protected void loadAdditional(@NotNull final ValueInput input)
     {
-        super.loadAdditional(compound, provider);
-
-        range = compound.getInt(TAG_RANGE);
-        this.progress = compound.getInt(TAG_PROGRESS);
-        input = values()[compound.getInt(TAG_DIRECTION)];
-        on = compound.getBoolean(TAG_INPUT);
-        if (compound.getAllKeys().contains(TAG_OUTPUT_DIRECTION))
-        {
-            output = values()[compound.getInt(TAG_OUTPUT_DIRECTION)];
-        }
-        else
-        {
-            output = input.getOpposite();
-        }
-        speed = compound.getInt(TAG_SPEED);
+        super.loadAdditional(input);
+        range = input.getIntOr(TAG_RANGE, DEFAULT_RANGE);
+        progress = input.getIntOr(TAG_PROGRESS, 0);
+        final int inputOrdinal = input.getIntOr(TAG_DIRECTION, UP.ordinal());
+        this.input = Direction.values()[Math.floorMod(inputOrdinal, Direction.values().length)];
+        on = input.getBooleanOr(TAG_INPUT, false);
+        output = input.getInt(TAG_OUTPUT_DIRECTION)
+            .map(index -> Direction.values()[Math.floorMod(index, Direction.values().length)])
+            .orElse(this.input.getOpposite());
+        speed = Math.max(MIN_SPEED, input.getIntOr(TAG_SPEED, DEFAULT_SPEED));
     }
 
     @Override
-    public void saveAdditional(@NotNull final CompoundTag compound, final HolderLookup.Provider provider)
+    protected void saveAdditional(@NotNull final ValueOutput output)
     {
-        super.saveAdditional(compound, provider);
-        compound.putInt(TAG_RANGE, range);
-        compound.putInt(TAG_PROGRESS, progress);
-        compound.putInt(TAG_DIRECTION, input.ordinal());
-        compound.putBoolean(TAG_INPUT, on);
-        if (output != null)
-        {
-            compound.putInt(TAG_OUTPUT_DIRECTION, output.ordinal());
-        }
-        compound.putInt(TAG_SPEED, speed);
+        super.saveAdditional(output);
+        output.putInt(TAG_RANGE, range);
+        output.putInt(TAG_PROGRESS, progress);
+        output.putInt(TAG_DIRECTION, input.ordinal());
+        output.putBoolean(TAG_INPUT, on);
+        output.putInt(TAG_OUTPUT_DIRECTION, this.output.ordinal());
+        output.putInt(TAG_SPEED, speed);
     }
 
     @Override
-    public void handleUpdateTag(final CompoundTag tag, final HolderLookup.Provider provider)
+    public CompoundTag getUpdateTag(final HolderLookup.Provider registries)
     {
-        this.loadAdditional(tag, provider);
+        return saveWithFullMetadata(registries);
     }
 
     @Override
-    public void onDataPacket(final Connection net, final ClientboundBlockEntityDataPacket pkt, final HolderLookup.Provider provider)
+    public void handleUpdateTag(final ValueInput input)
     {
-        this.loadAdditional(pkt.getTag(), provider);
+        loadAdditional(input);
     }
 
-    @Nullable
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket()
     {
-        CompoundTag nbt = new CompoundTag();
-        this.saveAdditional(nbt, level.registryAccess());
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    @NotNull
     @Override
-    public CompoundTag getUpdateTag(final HolderLookup.Provider provider)
+    public void onDataPacket(final Connection connection, final ValueInput input)
     {
-        return saveWithId(provider);
+        loadAdditional(input);
     }
-
-
 }

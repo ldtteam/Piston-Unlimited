@@ -5,7 +5,7 @@ import com.ldtteam.blockui.controls.TextField;
 import com.ldtteam.blockui.mod.Log;
 import com.ldtteam.blockui.views.DropDownList;
 import com.ldtteam.multipiston.network.MultiPistonChangeMessage;
-import com.ldtteam.structurize.api.Utils;
+import com.ldtteam.structurize.api.util.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -196,7 +196,7 @@ public class WindowMultiPiston extends AbstractWindowSkeleton
         if (tempInput.equals(output))
         {
             Utils.playErrorSound(Minecraft.getInstance().player);
-            Minecraft.getInstance().player.displayClientMessage(Component.translatable("com.ldtteam.multipiston.equalpos"), false);
+            Minecraft.getInstance().player.sendSystemMessage(Component.translatable("com.ldtteam.multipiston.equalpos"));
             this.inputDropdown.setSelectedIndex(COLORS.indexOf(COLOR_MAP.get(input)));
         }
         else
@@ -216,7 +216,7 @@ public class WindowMultiPiston extends AbstractWindowSkeleton
         if (tempOutput.equals(input))
         {
             Utils.playErrorSound(Minecraft.getInstance().player);
-            Minecraft.getInstance().player.displayClientMessage(Component.translatable("com.ldtteam.multipiston.equalpos"), false);
+            Minecraft.getInstance().player.sendSystemMessage(Component.translatable("com.ldtteam.multipiston.equalpos"));
             this.outputDropdown.setSelectedIndex(COLORS.indexOf(COLOR_MAP.get(output)));
         }
         else
